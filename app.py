@@ -71,9 +71,18 @@ def counter():
         Дата и время: ''' + str(time) + '''<br>
         Запрошенный адрес: ''' + url + '''<br>
         Ваш IP-адрес: ''' + client_ip + '''<br>
+        <hr>
+        <a href="/counter/reset">Сбросить счётчик</a>
     </body>
 </html>
 '''
+
+@app.route("/counter/reset")
+def reset_counter():
+    global count
+    count = 0
+    return redirect("/counter")
+
 @app.route("/info")
 def info():
     return redirect("/author")
