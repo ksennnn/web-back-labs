@@ -6,6 +6,82 @@ app = Flask(__name__)
 def not_found(err):
     return "нет такой страницы", 404
 
+@app.route("/bad_request")
+def bad_request():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>400 — Bad Request</h1>
+        <p>Сервер не может обработать запрос из-за ошибки клиента.</p>
+    </body>
+</html>
+''', 400
+
+
+@app.route("/unauthorized")
+def unauthorized():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>401 — Unauthorized</h1>
+        <p>КТО ТЫ? Для доступа требуется авторизация.</p>
+    </body>
+</html>
+''', 401
+
+
+@app.route("/payment_required")
+def payment_required():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>402 — Payment Required</h1>
+        <p>Заплати, потом иди</p>
+    </body>
+</html>
+''', 402
+
+
+@app.route("/forbidden")
+def forbidden():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>403 — Forbidden</h1>
+        <p>Доступ запрещён.</p>
+    </body>
+</html>
+''', 403
+
+
+@app.route("/method_not_allowed")
+def method_not_allowed():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>405 — Method Not Allowed</h1>
+        <p>Метод запроса не разрешён для данного ресурса.</p>
+    </body>
+</html>
+''', 405
+
+@app.route("/teapot")
+def teapot():
+    return '''
+<!doctype html>
+<html>
+    <body>
+        <h1>418 — I'm a teapot</h1>
+        <p>Я — чайник. Заваривать кофе я не умею.</p>
+    </body>
+</html>
+''', 418
+
 @app.route('/')
 @app.route('/index')
 def index():
