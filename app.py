@@ -183,7 +183,7 @@ def internal_error(err):
     <body>
         <h1>500 — Внутренняя ошибка сервера</h1>
         <p>Упс! На сервере что-то пошло не так</p>
-        <p>Мы уже работаем над исправлением.</p>
+        <p>Уже бежим исправлять.</p>
         <br>
         <a href="/">Вернуться на главную</a>
     </body>
@@ -299,7 +299,7 @@ def reset_counter():
 def info():
     return redirect("/lab1/author")
 
-@app.route("/created")
+@app.route("/lab1/created")
 def created():
     return '''
 <!doctype html>
@@ -327,6 +327,50 @@ def lab1():
             веб-приложений, сознательно предоставляющих лишь самые базовые возможности.
         </p>
         <a href='/'>Вернуться на главную страницу</a>
+        <h2>Список роутов</h2>
+        <ul>
+            <li>
+                <a href='/lab1/web'>Web-serber на Flask</a>
+            </li>
+            <li>
+                <a href='/lab1/image'>Картинка</a>
+            </li>
+            <li>
+                <a href='/lab1/author'>Автор</a>
+            </li>
+            <li>
+                <a href='/lab1/counter'>Счетчик</a>
+            </li>
+            <li>
+                <a href='/lab1/info'>Перенаправление</a>
+            </li>
+            <li>
+                <a href='/lab1/created'>Код ответа 201</a>
+            </li>
+            <li>
+                <a href='/bad_request'>Ошибка 400</a>
+            </li>
+            <li>
+                <a href='/unauthorized'>Ошибка 401</a>
+            </li>
+            <li>
+                <a href='/payment_required'>Ошибка 402</a>
+            </li>
+            <li>
+                <a href='/forbidden'>Ошибка 403</a>
+            </li>
+            <li>
+                <a href='/lab1/oops'>Ошибка 404</a>
+            </li>
+            <li>
+                <a href='/method_not_allowed'>Ошибка 405</a>
+            </li>
+            <li>
+                <a href='/teapot'>Ошибка 418</a>
+            </li>
+            <li>
+                <a href='/server-error'>Ошибка 500</a>
+            </li>
     </body>
 </html>
 '''
