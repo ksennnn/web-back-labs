@@ -20,7 +20,7 @@ def not_found(err):
             }
             h1 {
                 font-size: 48px;
-                color: #cc0000;
+                color: #4E5754;
             }
             p {
                 font-size: 20px;
@@ -34,14 +34,14 @@ def not_found(err):
                 display: inline-block;
                 margin-top: 30px;
                 padding: 10px 20px;
-                background-color: #cc0000;
+                background-color: #4E5754;
                 color: white;
                 text-decoration: none;
                 border-radius: 8px;
                 transition: 0.3s;
             }
             a:hover {
-                background-color: #990000;
+                background-color: #480607;
             }
         </style>
     </head>
@@ -131,6 +131,64 @@ def teapot():
     </body>
 </html>
 ''', 418
+
+@app.route("/server-error")
+def server_error():
+    # специально вызовем ошибку делением на ноль
+    return 1 / 0  
+
+
+@app.errorhandler(500)
+def internal_error(err):
+    return '''
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Ошибка сервера</title>
+        <style>
+            body {
+                background-color: #fff3f3;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 50px;
+            }
+            h1 {
+                font-size: 48px;
+                color: #B00000;
+            }
+            p {
+                font-size: 20px;
+                color: #333;
+            }
+            img {
+                max-width: 300px;
+                margin-top: 20px;
+            }
+            a {
+                display: inline-block;
+                margin-top: 30px;
+                padding: 10px 20px;
+                background-color: #B00000;
+                color: white;
+                text-decoration: none;
+                border-radius: 8px;
+                transition: 0.3s;
+            }
+            a:hover {
+                background-color: #293133;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>500 — Внутренняя ошибка сервера</h1>
+        <p>Упс! На сервере что-то пошло не так</p>
+        <p>Мы уже работаем над исправлением.</p>
+        <br>
+        <a href="/">Вернуться на главную</a>
+    </body>
+</html>
+''', 500
 
 @app.route('/')
 @app.route('/index')
