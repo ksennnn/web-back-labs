@@ -2,9 +2,23 @@ from flask import Flask, url_for, request, redirect
 import datetime
 app = Flask(__name__)
 
+log404 = []
 @app.errorhandler(404)
 def not_found(err):
+    ip = request.remote_addr
+    time = datetime.datetime.today()
+    url = request.url
+
+    log404.append(f"[<i>{time}</i>, пользователь <i>{ip}</i>] зашёл на адрес <i>{url}</i>")
+
     img_path = url_for("static", filename="404.jpg")
+
+    # формируем HTML для журнала
+    log_html = "<ul style='list-style:none; padding:0;'>"
+    for entry in log404:
+        log_html += f"<li style='margin:5px 0; padding:10px; background:#eee; border-radius:6px;'>{entry}</li>"
+    log_html += "</ul>"
+
     return '''
 <!doctype html>
 <html>
@@ -16,7 +30,7 @@ def not_found(err):
                 background-color: #f2f2f2;
                 font-family: Arial, sans-serif;
                 text-align: center;
-                padding: 50px;
+                padding: 30px;
             }
             h1 {
                 font-size: 48px;
@@ -43,15 +57,34 @@ def not_found(err):
             a:hover {
                 background-color: #480607;
             }
+            .log {
+                margin-top: 40px;
+                text-align: left;
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+            .log h2 {
+                color: #4E5754;
+                margin-bottom: 15px;
+            }
         </style>
     </head>
     <body>
         <h1>Ой! Ошибка 404</h1>
         <p>О нет, ты потерялся</p>
-        <p>Беги скорей отсюда</p>
+        <p>Твой IP: ''' + ip + '''</p>
+        <p>Дата и время: ''' + str(time) + '''</p>
+        <p>Запрошенный адрес: ''' + url + '''</p>
         <img src="''' + img_path + '''">
         <br>
         <a href="/">Вернуться на главную</a>
+
+        <div class="log">
+            <h2>Журнал посещений 404:</h2>
+            ''' + log_html + '''
+        </div>
     </body>
 </html>
 ''', 404
