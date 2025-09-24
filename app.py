@@ -443,4 +443,4 @@ def example():
     number = '2'
     group = 'ФБИ-32'
     kurs = '3'
-    return render_template('example.html', name=name, number=number, group=group, kurs=kurs)
+    return render_template('example.html')
