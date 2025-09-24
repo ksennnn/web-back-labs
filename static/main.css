@@ -1,0 +1,28 @@
+body {
+    margin: 0;
+    background-color: rgb(233, 192, 145);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+main {
+    color: rgb(32, 24, 15);
+    text-align: justify;
+    padding: 20px;
+    margin-bottom: 40px;
+}
+header {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgb(70, 52, 32);
+    color: rgb(233, 192, 145);
+}
+footer {
+    margin-top: 20px;
+    padding: 10px;
+    background: rgb(70, 52, 32);
+    color: rgb(233, 192, 145);
+    text-align: right;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
