@@ -407,3 +407,12 @@ def lab1():
     </body>
 </html>
 '''
+@app.route('/lab2/a')
+def a1():
+    return 'без слэша'
+
+@app.route('/lab2/a/')
+def a2():
+    return 'со слэшем'
+
+
