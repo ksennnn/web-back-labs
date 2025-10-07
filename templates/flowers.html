@@ -5,6 +5,7 @@
 
 {# основной контент#}
 {% block main %}
-    <h1>Цветок №{{ flower_id }} - {{ flower }}</h1>
+    <h1>Цветок №{{ flower_id }} - {{ flower.name }}</h1>
+    <p><b>Цена:</b> {{ flower.price }} руб.</p>
     <a href="{{ all_flowers_url }}">Перейти к списку всех цветов</a>
 {% endblock %}
