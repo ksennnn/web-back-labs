@@ -504,3 +504,31 @@ def lab2():
 def filters():
     phrase = 'О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных...'
     return render_template('filter.html', phrase=phrase)
+
+@app.route('/lab2/calc/<int:a>/<int:b>')
+def calc(a, b):
+    css = url_for('static', filename='main.css')
+    return f'''
+<!doctype html>
+<html>
+    <head>
+        <title>Выражения</title>
+    </head>
+    <body>
+        <h1>Расчёт с параметрами:</h1>
+        <p>{a} + {b} = {a + b}</p>
+        <p>{a} - {b} = {a - b}</p>
+        <p>{a} × {b} = {a * b}</p>
+        <p>{a} : {b} = {a / b if b != 0 else '&infin;'}</p>
+        <p>{a}<sup>{b}</sup> = {a ** b}</p>
+    </body>
+</html>
+'''
+
+@app.route('/lab2/calc/')
+def calc_1_1():
+    return redirect('/lab2/calc/1/1')
+
+@app.route('/lab2/calc/<int:a>')
+def calc_a_1(a):
+    return redirect(url_for('calc', a=a, b=1))
