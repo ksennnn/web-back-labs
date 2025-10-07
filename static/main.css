@@ -4,7 +4,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 main {
-    color: rgb(32, 24, 15);
+    color: rgb(72, 53, 30);
     text-align: justify;
     padding: 20px;
     margin-bottom: 40px;
@@ -25,4 +25,12 @@ footer {
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+a {
+    color: rgb(144, 0, 255); 
+}
+a:hover {
+    text-decoration: none;
+    color: rgb(185, 15, 15);
 }
