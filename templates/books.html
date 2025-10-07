@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{# номер лабораторной работы: #}
+{% block lab %}Лабораторная работа 2{% endblock %}
+
+{# основной контент#}
+{% block main %}
+    <h1>Список книг</h1>
+    <ul style="list-style-type: none; padding: 0;">
+        {% for book in books %}
+        <li style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc;
+        border-radius: 8px; background-color: #f9f9f9; width: 500px;">
+            <b>{{ loop.index }}. {{ book.title }}</b><br>
+            <i>Автор:</i> {{ book.author }}<br>
+            <i>Жанр:</i> {{ book.genre }}<br>
+            <i>Количество страниц:</i> {{ book.pages }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <p><a href="/lab2/">Назад к лабораторной работе</a></p>
+{% endblock %}

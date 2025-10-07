@@ -532,3 +532,19 @@ def calc_1_1():
 @app.route('/lab2/calc/<int:a>')
 def calc_a_1(a):
     return redirect(url_for('calc', a=a, b=1))
+
+books = [
+        {'author': 'Фёдор Достоевский', 'title': 'Преступление и наказание', 'genre': 'Роман', 'pages': 672},
+        {'author': 'Лев Толстой', 'title': 'Война и мир', 'genre': 'Роман-эпопея', 'pages': 1225},
+        {'author': 'Александр Пушкин', 'title': 'Евгений Онегин', 'genre': 'Роман в стихах', 'pages': 384},
+        {'author': 'Николай Гоголь', 'title': 'Мёртвые души', 'genre': 'Роман', 'pages': 512},
+        {'author': 'Иван Тургенев', 'title': 'Отцы и дети', 'genre': 'Роман', 'pages': 368},
+        {'author': 'Антон Чехов', 'title': 'Вишнёвый сад', 'genre': 'Пьеса', 'pages': 96},
+        {'author': 'Михаил Булгаков', 'title': 'Мастер и Маргарита', 'genre': 'Мистика', 'pages': 480},
+        {'author': 'Даниил Гранин', 'title': 'Иду на грозу', 'genre': 'Роман', 'pages': 544},
+        {'author': 'Александр Дюма', 'title': 'Три мушкетёра', 'genre': 'Приключения', 'pages': 640},
+        {'author': 'Жюль Верн', 'title': 'Двадцать тысяч лье под водой', 'genre': 'Приключения', 'pages': 464}
+]
+@app.route('/lab2/books')
+def show_books():
+    return render_template('books.html', books=books)
