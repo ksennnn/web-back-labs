@@ -150,3 +150,76 @@ def reset_settings():
     resp.delete_cookie('font_size')
     resp.delete_cookie('font_family')
     return resp
+
+
+@lab3.route('/lab3/products')
+def products():
+    items = [
+        {"name": "iPhone 15", "brand": "Apple", "price": 120000, "color": "чёрный"},
+        {"name": "Samsung Galaxy S23", "brand": "Samsung", "price": 95000, "color": "серебристый"},
+        {"name": "Xiaomi 14", "brand": "Xiaomi", "price": 78000, "color": "синий"},
+        {"name": "Google Pixel 8", "brand": "Google", "price": 88000, "color": "зелёный"},
+        {"name": "OnePlus 12", "brand": "OnePlus", "price": 89000, "color": "чёрный"},
+        {"name": "Nothing Phone 2", "brand": "Nothing", "price": 65000, "color": "белый"},
+        {"name": "Honor Magic 6", "brand": "Honor", "price": 72000, "color": "серый"},
+        {"name": "Realme GT 6", "brand": "Realme", "price": 55000, "color": "синий"},
+        {"name": "Sony Xperia 1 V", "brand": "Sony", "price": 110000, "color": "фиолетовый"},
+        {"name": "Asus Zenfone 10", "brand": "Asus", "price": 93000, "color": "зелёный"},
+        {"name": "Huawei P60", "brand": "Huawei", "price": 81000, "color": "чёрный"},
+        {"name": "Poco F6 Pro", "brand": "Poco", "price": 48000, "color": "белый"},
+        {"name": "Infinix GT 20", "brand": "Infinix", "price": 41000, "color": "красный"},
+        {"name": "Motorola Edge 40", "brand": "Motorola", "price": 59000, "color": "серебристый"},
+        {"name": "Nokia XR21", "brand": "Nokia", "price": 52000, "color": "чёрный"},
+        {"name": "Tecno Phantom X2", "brand": "Tecno", "price": 47000, "color": "оранжевый"},
+        {"name": "ZTE Nubia Z60", "brand": "ZTE", "price": 76000, "color": "серый"},
+        {"name": "Vivo X100", "brand": "Vivo", "price": 85000, "color": "белый"},
+        {"name": "Meizu 21", "brand": "Meizu", "price": 68000, "color": "синий"},
+        {"name": "Oppo Find X6", "brand": "Oppo", "price": 94000, "color": "золотой"},
+    ]
+
+    min_price_total = min(i["price"] for i in items)
+    max_price_total = max(i["price"] for i in items)
+
+    if request.args.get('reset'):
+        resp = make_response(redirect('/lab3/products'))
+        resp.delete_cookie('min_price')
+        resp.delete_cookie('max_price')
+        return resp
+
+    min_price = request.args.get('min_price')
+    max_price = request.args.get('max_price')
+
+    if not min_price:
+        min_price = request.cookies.get('min_price')
+    if not max_price:
+        max_price = request.cookies.get('max_price')
+
+    try:
+        min_price = int(min_price) if min_price else None
+        max_price = int(max_price) if max_price else None
+    except ValueError:
+        min_price, max_price = None, None
+
+    if min_price and max_price and min_price > max_price:
+        min_price, max_price = max_price, min_price
+
+    filtered = []
+    for item in items:
+        price = item["price"]
+        if (min_price is None or price >= min_price) and (max_price is None or price <= max_price):
+            filtered.append(item)
+
+    resp = make_response(render_template(
+        'lab3/products.html',
+        items=filtered,
+        total=len(filtered),
+        min_price=min_price,
+        max_price=max_price,
+        min_price_total=min_price_total,
+        max_price_total=max_price_total
+    ))
+    if min_price is not None:
+        resp.set_cookie('min_price', str(min_price))
+    if max_price is not None:
+        resp.set_cookie('max_price', str(max_price))
+    return resp

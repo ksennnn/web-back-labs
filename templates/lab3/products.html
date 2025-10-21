@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block lab %}Лабораторная 3{% endblock %}
+
+{% block main %}
+<style>
+.products-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 25px;
+    background: #f9fafb;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-family: "Segoe UI", sans-serif;
+}
+form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+input[type="number"] {
+    width: 140px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+button {
+    background: #cc00ff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover {
+    background: #4b015e;
+}
+.reset {
+    background: #ac193e;
+}
+.reset:hover {
+    background: #4a0a1a;
+}
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    text-align: center;
+}
+.card h3 {
+    margin-bottom: 10px;
+}
+.price {
+    font-weight: bold;
+    color: #216c62;
+}
+</style>
+
+<div class="products-container">
+    <h1 style="text-align:center;">Поиск товаров по диапазону цен</h1>
+
+    <form method="get" action="/lab3/products">
+        <input type="number" name="min_price" placeholder="от {{ min_price_total }}" value="{{ min_price or '' }}">
+        <input type="number" name="max_price" placeholder="до {{ max_price_total }}" value="{{ max_price or '' }}">
+        <button type="submit">Искать</button>
+        <button type="submit" name="reset" value="1" class="reset">Сброс</button>
+    </form>
+
+    {% if total > 0 %}
+        <p style="text-align:center;">Найдено товаров: <strong>{{ total }}</strong></p>
+        <div class="products">
+            {% for item in items %}
+                <div class="card">
+                    <h3>{{ item.name }}</h3>
+                    <p>Бренд: {{ item.brand }}</p>
+                    <p>Цвет: {{ item.color }}</p>
+                    <p class="price">Цена: {{ item.price }} руб.</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="text-align:center; color:red;">Не найдено ни одного товара.</p>
+    {% endif %}
+</div>
+{% endblock %}
