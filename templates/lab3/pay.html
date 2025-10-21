@@ -1,0 +1,88 @@
+{% extends "base.html" %} 
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<style>
+    .pay-container {
+        max-width: 400px;
+        margin: 30px auto;
+        background: #fdfdfd;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    div {
+        text-align: center;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    input[type="text"] {
+        width: 60%;
+        padding: 8px;
+        margin: 8px 0 15px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+    button {
+        background: #2196F3;
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background: #1976d2;
+    }
+    a {
+        color: #555;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    .price {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #222;
+    }
+</style>
+
+<div class="pay-container">
+    <h1>Оплата</h1>
+
+    <div class="price">
+        Сумма к оплате: <b>{{ price }}</b>
+    </div>
+
+    <form action="/lab3/success">
+        <input type="hidden" name="price" value="{{ price }}">
+
+        <div>Номер банковской карты:</div>
+        <label>
+            <input type="text"  name="card" pattern="\d{16}" required placeholder="16 цифр без пробелов">
+        </label>
+
+        <div>Имя держателя карты:</div>
+        <label>
+            <input type="text"  name="name" required placeholder="Как на карте">
+        </label>
+
+        <div>Номер CVV:</div>
+        <label>
+            <input type="text"  name="cvv" size="3" pattern="\d{3}" required placeholder="3 цифры на обороте">
+        </label>
+
+        <div style="text-align:center;">
+            <button type="submit">Заказать</button><br>
+            <a href="/lab3/order">Отказаться</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

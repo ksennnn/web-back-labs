@@ -1,0 +1,75 @@
+{% extends "base.html" %} 
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+<style>
+    .order-container {
+        max-width: 500px;
+        margin: 30px auto;
+        background: #fafafa;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-family: "Segoe UI", sans-serif;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    form div {
+        margin-top: 15px;
+        font-weight: 600;
+        color: #444;
+    }
+    label {
+        display: block;
+        margin-left: 10px;
+        font-weight: normal;
+        color: #333;
+    }
+    button {
+        background: #4CAF50;
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-size: 16px;
+    }
+    button:hover {
+        background: #43a047;
+    }
+</style>
+
+<div class="order-container">
+    <h1>Заказ напитка</h1>
+
+    <form action="/lab3/pay">
+        <div>Напиток:</div>
+        <label>
+            <input type="radio" value="coffee" name="drink" checked>кофе &mdash; <b>120 руб</b><br>
+        </label>
+        <label>
+            <input type="radio" value="black-tea" name="drink" >чёрный чай &mdash; <b>80 руб</b> <br>
+        </label>
+        <label>
+            <input type="radio" value="green-tea" name="drink" >зелёный чай &mdash; <b>70 руб</b><br>
+        </label>
+
+        <div>Добавки:</div>
+        <label>
+            <input type="checkbox"  name="milk" >молоко &mdash; <b>30 руб</b><br>
+        </label>
+        <label>
+            <input type="checkbox"  name="sugar" >сахар &mdash; <b>10 руб</b><br>
+        </label>
+
+        <div style="text-align: center;">
+            <button type="submit">Перейти к оплате</button>
+        </div>
+    </form>
+</div>
+    
+{% endblock %}
