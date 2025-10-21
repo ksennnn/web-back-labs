@@ -34,3 +34,6 @@ a:hover {
     text-decoration: none;
     color: rgb(185, 15, 15);
 }
+.error {
+    color: red;
+}
