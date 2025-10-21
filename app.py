@@ -18,7 +18,7 @@ def not_found(err):
 
     log404.append(f"[<i>{time}</i>, пользователь <i>{ip}</i>] зашёл на адрес <i>{url}</i>")
 
-    img_path = url_for("static", filename="404.jpg")
+    img_path = url_for("static", filename="/lab1/404.jpg")
 
     # формируем HTML для журнала
     log_html = "<ul style='list-style:none; padding:0;'>"

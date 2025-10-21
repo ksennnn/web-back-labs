@@ -29,14 +29,14 @@ def flowers(flower_id):
     else:
         flower = flower_list[flower_id] 
         all_flowers_url = url_for('lab2.all_flowers')
-        return render_template('flowers.html', flower_id=flower_id, flower=flower,
+        return render_template('lab2/flowers.html', flower_id=flower_id, flower=flower,
         all_flowers_url=all_flowers_url)
 
 
 @lab2.route('/lab2/add_flower/<name>/<int:price>')
 def add_flower(name, price):
     flower_list.append({'name': name, 'price': price})
-    return render_template('add_flower.html', name=name, price=price)
+    return render_template('lab2/add_flower.html', name=name, price=price)
 
 
 @lab2.route('/lab2/add_flower')
@@ -44,20 +44,20 @@ def add_flower_in():
     name = request.args.get('name')
     price = request.args.get('price', type=int)
     if not name or price is None:
-        return render_template('error.html'), 404
+        return render_template('lab2/error.html'), 404
     flower_list.append({'name': name, 'price': price})
     return redirect(url_for('lab2.all_flowers'))
 
 
 @lab2.route('/lab2/flowers/all')
 def all_flowers():
-    return render_template('flowers_all.html', flower_list=flower_list)
+    return render_template('lab2/flowers_all.html', flower_list=flower_list)
 
 
 @lab2.route('/lab2/clean_flower')
 def clean_flower():
         flower_list.clear()
-        return render_template('cleaner_flowers.html')
+        return render_template('lab2/cleaner_flowers.html')
 
 
 @lab2.route('/lab2/delete_flower/<int:flower_id>')
@@ -78,20 +78,20 @@ def example():
         {'name': 'мандарины', 'price': 95},
         {'name': 'манго', 'price': 321}
     ]
-    return render_template('example.html',
+    return render_template('lab2/example.html',
                            name=name, number=number, group=group,
                            kurs=kurs, fruits=fruits)
 
 
 @lab2.route('/lab2/')
 def lab():
-    return render_template('lab2.html')
+    return render_template('lab2/lab2.html')
 
 
 @lab2.route('/lab2/filters')
 def filters():
     phrase = 'О <b>сколько</b> <u>нам</u> <i>открытий</i> чудных...'
-    return render_template('filter.html', phrase=phrase)
+    return render_template('lab2/filter.html', phrase=phrase)
 
 
 @lab2.route('/lab2/calc/<int:a>/<int:b>')
@@ -141,7 +141,7 @@ books = [
 
 @lab2.route('/lab2/books')
 def show_books():
-    return render_template('books.html', books=books)
+    return render_template('lab2/books.html', books=books)
 
 
 cats = [
@@ -170,4 +170,4 @@ cats = [
 
 @lab2.route('/lab2/cats')
 def show_cats():
-    return render_template('cats.html', cats=cats)
+    return render_template('lab2/cats.html', cats=cats)
