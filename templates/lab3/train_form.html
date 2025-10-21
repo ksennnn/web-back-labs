@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block lab %}Лабораторная 3{% endblock %}
+
+{% block main %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 25px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-family: "Segoe UI", sans-serif;
+        text-align: center;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select {
+        width: 75%;
+        padding: 8px;
+        margin: 5px 0 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        text-align: center;
+    }
+    button {
+        background: #007bff;
+        color: white;
+        padding: 10px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background: #0056b3;
+    }
+</style>
+
+<div class="form-container">
+    <h1>Форма железнодорожного билета</h1>
+    <form action="/lab3/ticket">
+        <label>ФИО пассажира:</label><br>
+        <input type="text" name="fio" required><br>
+
+        <label>Полка:</label><br>
+        <select name="polka" required>
+            <option value="bottom">Нижняя</option>
+            <option value="top">Верхняя</option>
+            <option value="bottom-bok">Нижняя боковая</option>
+            <option value="top-bok">Верхняя боковая</option>
+        </select><br>
+
+        <label><input type="checkbox" name="belie">С бельём</label><br>
+        <label><input type="checkbox" name="bagazh">С багажом</label><br>
+
+        <label>Возраст:</label><br>
+        <input type="number" name="age" min="1" max="120" required><br>
+
+        <label>Пункт выезда:</label><br>
+        <input type="text" name="viezd" required><br>
+
+        <label>Пункт назначения:</label><br>
+        <input type="text" name="naznachenie" required><br>
+
+        <label>Дата поездки:</label><br>
+        <input type="date" name="data" required><br>
+
+        <label><input type="checkbox" name="strahovka">Нужна страховка</label><br><br>
+
+        <div style="text-align:center;">
+            <button type="submit">Сформировать билет</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block lab %}Лабораторная 3{% endblock %}
+
+{% block main %}
+<style>
+    .ticket {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 25px;
+        background: #fffef3;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        font-family: "Segoe UI", sans-serif;
+    }
+    h1 {
+        text-align: center;
+        color: #2e7d32;
+    }
+    p {
+        margin: 5px 0;
+        font-size: 16px;
+    }
+    .price {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: #000;
+        margin-top: 20px;
+    }
+    .back {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="ticket">
+    <h1>Железнодорожный билет</h1>
+    {% if age < 18 %}<h2><i>Детский билет</i></h2>{% endif %}
+
+    <p><b>ФИО пассажира:</b> {{ fio }}</p>
+    <p><b>Возраст:</b> {{ age }}</p>
+    <p><b>Маршрут:</b> {{ viezd }} → {{ naznachenie }}</p>
+    <p><b>Дата поездки:</b> {{ data }}</p>
+    <p><b>Полка:</b>
+        {% if polka == 'bottom' %}Нижняя
+        {% elif polka == 'top' %}Верхняя
+        {% elif polka == 'bottom-bok' %}Нижняя боковая
+        {% elif polka == 'top-bok' %}Верхняя боковая
+        {% else %}Не указана{% endif %}
+    </p>
+    <p><b>Бельё:</b> {% if belie %}Да{% else %}Нет{% endif %}</p>
+    <p><b>Багаж:</b> {% if bagazh %}Да{% else %}Нет{% endif %}</p>
+    <p><b>Страховка:</b> {% if strahovka %}Да{% else %}Нет{% endif %}</p>
+
+    <div class="price">
+        Итоговая стоимость: {{ total_price }} руб.
+    </div>
+
+    <a class="back" href="/lab3/ticket">← Вернуться к оформлению</a>
+</div>
+{% endblock %}

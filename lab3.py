@@ -99,3 +99,44 @@ def settings():
 
     return render_template('lab3/settings.html', color=color, bg_color=bg_color, font_size=font_size,
                            font_family=font_family)
+
+
+@lab3.route('/lab3/ticket')
+def ticket():
+    fio = request.args.get('fio')
+    polka = request.args.get('polka')
+    belie = request.args.get('belie') == 'on'
+    bagazh = request.args.get('bagazh') == 'on'
+    age = request.args.get('age')
+    viezd = request.args.get('viezd')
+    naznachenie = request.args.get('naznachenie')
+    data = request.args.get('data')
+    strahovka = request.args.get('strahovka') == 'on'
+
+    if not fio:
+        return render_template('/lab3/train_form.html')
+    if age:
+        age_int = int(age)
+    else:
+        age_int = 0
+
+    if age_int < 18:
+        base_price = 700
+    else:
+        base_price = 1000
+    
+    if polka == 'bottom' or polka == 'bottom-bok':
+        polka_price = 100
+    else:
+        polka_price = 0
+    
+    total_price = base_price + polka_price
+    if belie:
+        total_price += 75
+    if bagazh:
+        total_price += 250
+    if strahovka:
+        total_price += 150
+    return render_template('/lab3/train_ticket.html', fio=fio, polka=polka, belie=belie, bagazh=bagazh, age=age_int, 
+                        viezd=viezd, naznachenie=naznachenie, data=data, strahovka=strahovka, base_price=base_price,
+                        polka_price=polka_price, total_price=total_price)
