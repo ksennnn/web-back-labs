@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block lab %}Лабораторная работа 3{% endblock %}
+
+{% block main %}
+    <h1>Cookies</h1>
+    <form>
+        <div>
+            <p><label>Выберите цвет текста</label>
+            <input type="color" name="color" value="{{ color or ''}}"></p>
+            <p><label>Выберите цвет фона</label>
+            <input type="color" name="bg_color" value="{{ bg_color or ''}}"></p>
+            <p><label>Выберите размер шрифта:</label>
+            <input type="number" name="font_size" value="{{ font_size or '' }}"></p>
+            <p><label>Выберите шрифт:</label>
+            <input type="text" name="font_family" value="{{ font_family or ''}}"></p>
+        </div>
+        <div>
+            <button type="submit">OK</button>
+        </div>
+    </form>
+{% endblock%}
