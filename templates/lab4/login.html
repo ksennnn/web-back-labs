@@ -6,6 +6,9 @@
     {% if authorized %}
         <h1>Добро пожаловать, {{ name }}</h1>
         <div>
+            <a href="/lab4/users"><button>Список пользователей</button></a>
+        </div>
+        <div style="margin-top: 10px;">
             <form action="/lab4/logout" method="post">
                 <button>Выход</button>
             </form>
@@ -32,5 +35,8 @@
                 <a href="/lab4/login"><button type="button">Отмена</button></a>
             </div>
         </form>
+        <div style="margin-top: 15px;">
+            <p>Нет аккаунта? <a href="/lab4/register">Зарегистрироваться</a></p>
+        </div>
     {% endif %}
 {% endblock %}

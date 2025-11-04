@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 4{% endblock %}
+
+{% block main %}
+    <h1>Редактирование данных</h1>
+    <form method="post">
+        <div>
+            <label>Логин:</label>
+            <input type="text" name="login" value="{{ user.login }}">
+        </div>
+        <div>
+            <label>Имя:</label>
+            <input type="text" name="name" value="{{ user.name }}">
+        </div>
+        <div>
+            <label>Пол:</label>
+            <select name="gender">
+                <option value="м" {% if user.gender == 'м' %}selected{% endif %}>Мужской</option>
+                <option value="ж" {% if user.gender == 'ж' %}selected{% endif %}>Женский</option>
+            </select>
+        </div>
+        <div>
+            <label>Пароль:</label>
+            <input type="password" name="password" placeholder="Оставьте пустым, чтобы не менять">
+        </div>
+        <div>
+            <label>Подтверждение пароля:</label>
+            <input type="password" name="confirm" placeholder="Оставьте пустым, чтобы не менять">
+        </div>
+        {% if error %}
+            <div style="color: red; font-weight: bold;">{{ error }}</div>
+        {% endif %}
+        <div>
+            <button type="submit">Сохранить</button>
+            <a href="/lab4/users"><button type="button">Отмена</button></a>
+        </div>
+    </form>
+{% endblock %}

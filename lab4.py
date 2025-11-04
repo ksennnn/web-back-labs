@@ -137,6 +137,8 @@ def login():
     if request.method == 'GET':
         if 'login' in session:
             authorized=True
+            name = ''
+            gender = ''
             for user in users:
                 if user['login'] == session['login']:
                     name = user['name']
@@ -162,20 +164,128 @@ def login():
         error = 'Не введён пароль!'
         return render_template('/lab4/login.html', error=error, authorized=False, login=login)
 
+    authorized = False
     for user in users:
         if login == user['login'] and password == user['password']:
             session['login'] = login
             session['name'] = user['name']
-            return redirect('/lab4/login')
-    
-    error = 'Неверные логин и/или пароль!'
-    return render_template('lab4/login.html', error=error, authorized=False, login=login)
+            authorized = True
+            break
+
+    if authorized:
+        return redirect('/lab4/users')
+    else:
+        error = 'Неверные логин и/или пароль!'
+        return render_template('lab4/login.html', error=error, authorized=False, login=login)
 
 @lab4.route('/lab4/logout', methods = ['POST'])
 def logout():
     session.pop('login', None)
+    session.pop('name', None)
     return redirect('/lab4/login')
 
+@lab4.route('/lab4/register', methods=['GET','POST'])
+def register():
+    error = ''
+    if request.method == 'POST':
+        login_form = request.form.get('login')
+        name = request.form.get('name')
+        gender = request.form.get('gender')
+        password = request.form.get('password')
+        confirm = request.form.get('confirm')
+
+        if not login_form or not name or not password or not confirm or not gender:
+            error = 'Все поля обязательны'
+        elif password != confirm:
+            error = 'Пароли не совпадают'
+        else:
+            login_exists = False
+            for u in users:
+                if u['login'] == login_form:
+                    login_exists = True
+                    break
+            if login_exists:
+                error = 'Такой логин уже существует'
+            else:
+                users.append({
+                    'login': login_form,
+                    'password': password,
+                    'name': name,
+                    'gender': gender
+                })
+                session['login'] = login_form
+                session['name'] = name
+                return redirect('/lab4/users')
+
+    return render_template('lab4/register.html', error=error)
+
+
+@lab4.route('/lab4/users', methods=['GET'])
+def user_list():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+    return render_template('lab4/users.html', users=users, current_login=session['login'])
+
+
+@lab4.route('/lab4/users/edit', methods=['GET','POST'])
+def edit_user():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+
+    current_user = None
+    for u in users:
+        if u['login'] == session['login']:
+            current_user = u
+            break
+    if not current_user:
+        return redirect('/lab4/login')
+
+    error = ''
+    if request.method == 'POST':
+        login_form = request.form.get('login')
+        name = request.form.get('name')
+        gender = request.form.get('gender')
+        password = request.form.get('password')
+        confirm = request.form.get('confirm')
+
+        if not login_form or not name or not gender:
+            error = 'Логин, имя и пол не могут быть пустыми'
+        elif password != confirm:
+            error = 'Пароли не совпадают'
+        else:
+            login_exists = False
+            for u in users:
+                if u['login'] == login_form and u != current_user:
+                    login_exists = True
+                    break
+            if login_exists:
+                error = 'Такой логин уже существует'
+            else:
+                current_user['login'] = login_form
+                current_user['name'] = name
+                current_user['gender'] = gender
+                if password:
+                    current_user['password'] = password
+                session['login'] = login_form
+                session['name'] = name
+                return redirect('/lab4/users')
+
+    return render_template('lab4/edit_user.html', user=current_user, error=error)
+
+
+@lab4.route('/lab4/users/delete', methods=['POST'])
+def delete_user():
+    if 'login' not in session:
+        return redirect('/lab4/login')
+
+    for i, u in enumerate(users):
+        if u['login'] == session['login']:
+            users.pop(i)
+            break
+
+    session.pop('login', None)
+    session.pop('name', None)
+    return redirect('/lab4/login')
 
 @lab4.route('/lab4/fridge', methods=['GET', 'POST'])
 def fridge():

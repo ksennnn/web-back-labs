@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block lab %}Список пользователей{% endblock %}
+
+{% block main %}
+    <h1>Пользователи</h1>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Логин</th>
+            <th>Имя</th>
+            <th>Пол</th>
+            <th>Действия</th>
+        </tr>
+        {% for u in users %}
+            <tr>
+                <td>{{ u.login }}</td>
+                <td>{{ u.name }}</td>
+                <td>
+                    {% if u.gender == 'м' %}Мужской{% elif u.gender == 'ж' %}Женский{% else %}Не указан{% endif %}
+                </td>
+                <td>
+                    {% if u.login == current_login %}
+                        <a href="/lab4/users/edit"><button type="button">Редактировать</button></a>
+                        <form method="post" action="/lab4/users/delete" style="display:inline">
+                            <button type="submit">Удалить</button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="/lab4/login">На главную</a>
+{% endblock %}
