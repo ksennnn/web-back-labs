@@ -5,10 +5,15 @@
 
 {# основной контент: #}
 {% block main %}
+    <div>
+    <br>
     {% if error %}
         {{ error }}
     {% else %}
     <h1>Деление чисел</h1>
     {{ x1 }} / {{ x2 }} = {{ result }}
     {% endif %}
+    </div>
+    <br>
+    <a href="/lab4/div-form">Вернуться назад</a>
 {% endblock %}
