@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block lab %}Лабораторная работа 4{% endblock %}
+
+{% block main %}
+<h1>Заказ зерна</h1>
+
+<form method="post" style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
+        <label for="zerno">Выберите тип зерна:</label>
+        <select name="zerno" id="zerno" required>
+            <option value="" disabled {% if not zerno %}selected{% endif %}>Выберите зерно</option>
+            <option value="ячмень" {% if zerno == 'ячмень' %}selected{% endif %}>Ячмень (12 000 руб/т)</option>
+            <option value="овёс" {% if zerno == 'овёс' %}selected{% endif %}>Овёс (8 500 руб/т)</option>
+            <option value="пшеница" {% if zerno == 'пшеница' %}selected{% endif %}>Пшеница (9 000 руб/т)</option>
+            <option value="рожь" {% if zerno == 'рожь' %}selected{% endif %}>Рожь (15 000 руб/т)</option>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+        <label for="weight">Укажите вес (в тоннах):</label>
+        <input type="number" id="weight" name="weight" value="{{ weight }}">
+    </div>
+
+    <button type="submit">Оформить заказ</button>
+    <a href="/lab4/grain"><button type="button">Заново</button></a>
+</form>
+
+{% if message %}
+    <div style="margin-top: 15px; font-weight: bold; {% if 'Ошибка' in message %}color: red;{% else %}color: green;{% endif %}">
+        {{ message|safe }}
+    </div>
+{% endif %}
+{% endblock %}
