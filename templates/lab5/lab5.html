@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+<style>
+    .menu{
+        padding: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .menu a{
+        padding: 6px 12px;
+        background: #482f1e;
+        border-radius: 10px;
+        text-decoration: none;
+        border: 1px solid #331f10;
+        margin-left: auto;
+        color: beige;
+    }
+    .user {
+        margin-left: auto;
+        font-weight: bold;
+    }
+</style>
+    <h1>База знаний</h1>
+    <div class="menu">
+        <a href="/lab5/list">Список статей</a>
+        <a href="/lab5/create">Создать статью</a>
+        <a href="/lab5/login">Войти</a>
+        <a href="/lab5/register">Регистрация</a>
+        <div class="user">Anonymous</div>
+    </div>
+{% endblock %}
