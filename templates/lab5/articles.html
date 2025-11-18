@@ -3,12 +3,54 @@
 {% block lab %}Лабораторная работа 5{% endblock %}
 
 {% block main %}
+    <style>
+        h1 { text-align:center; }
+        .article {
+            background: #fff7ef;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #dac7b4;
+        }
+        blockquote {
+            background: #f7efe4;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        button {
+            padding: 6px 12px;
+            margin-right: 6px;
+            background: #6b4a2e;
+            color: beige;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover{
+            background: #8b6546;
+        }
+    </style>
 
     <h1>Статьи</h1>
 
+    {% if not articles %}
+        <p>У вас пока нет статей.</p>
+    {% endif %}
+
     {% for article in articles %}
-        <h2>{{ article['title'] }}</h2>
-        <blockquote>{{ article['article_text'] }}</blockquote>
+        <div class="article">
+            <h2>{{ article['title'] }}</h2>
+            <blockquote>{{ article['article_text'] }}</blockquote>
+
+            <form action="{{ url_for('lab5.delete', article_id=article['id']) }}" method="post" style="display:inline;">
+                <button type="submit">Удалить</button>
+            </form>
+
+            <form action="{{ url_for('lab5.edit', article_id=article['id']) }}" method="get" style="display:inline;">
+                <button type="submit">Редактировать</button>
+            </form>
+        </div>
     {% endfor %}
+
     <a href="/lab5/">Вернуться на главную</a>
-{% endblock %} 
+    {% endblock %}
