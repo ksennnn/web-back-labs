@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block lab %}Лабораторная работа 5{% endblock %}
+
+{% block main %}
+    <style>
+        h1 { text-align: center; }
+
+        .article {
+            background: #fff8ef;
+            padding: 15px;
+            margin: 15px auto;
+            width: 70%;
+            border-radius: 10px;
+            border: 1px solid #d8c4ad;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .back {
+            display: block;
+            margin: 20px auto;
+            width: fit-content;
+            padding: 8px 16px;
+            background: #6b4a2e;
+            color: beige;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .back:hover {
+            background: #8b6546;
+        }
+    </style>
+
+    <h1>Публичные статьи</h1>
+
+    {% if error %}
+        <p style="text-align:center; color:red;">{{ error }}</p>
+    {% else %}
+        {% for article in articles %}
+            <div class="article">
+                <h2>{{ article['title'] }}</h2>
+                <p>{{ article['article_text'] }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <a href="/lab5" class="back">На главную</a>
+{% endblock %}

@@ -19,23 +19,29 @@
         color: beige;
     }
     .user {
-        margin-left: auto;
         font-weight: bold;
+        font-size: 20px;
+        color: rgb(4, 141, 13);
     }
 </style>
     <h1>База знаний</h1>
+    <div class="user">
+        {% if login %}
+            Пользователь: {{ login  }}
+        {% else %}
+            Anonymous
+        {% endif %}
+    </div>
     <div class="menu">
-        <a href="/lab5/list">Список статей</a>
+        <a href="/lab5/public">Публичные статьи</a>
+        {% if login %}
+            <a href="/lab5/list">Список всех статей</a>
+        {% endif %}
         <a href="/lab5/create">Создать статью</a>
+        <a href="/lab5/users">Список пользователей</a>
+        <a href="/lab5/change">Сменить данные</a>
         <a href="/lab5/register">Регистрация</a>
         <a href="/lab5/login">Войти</a>
         <a href="/lab5/logout">Выйти</a>
-        <div class="user">
-            {% if login %}
-                {{ login  }}
-            {% else %}
-                Anonymous
-            {% endif %}
-        </div>
     </div>
 {% endblock %}
