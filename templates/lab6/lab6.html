@@ -22,6 +22,9 @@ function getOfficeList() {
     .then(function(data) {
         const office_list = data.result;
         const ul = document.getElementById('office-list');
+        const totalElement = document.getElementById('total-price');
+        const currentUser = "{{ session.get('login') }}";
+        let totalPrice = 0;
         for (let i=0; i < office_list.length; i++) {
             const office = office_list[i];
             const li = document.createElement('li');
@@ -34,6 +37,9 @@ function getOfficeList() {
                 li.appendChild(bookingButton);
             }
             if (office.tenant) {
+                if (office.tenant == currentUser) {
+                    totalPrice += office.price;
+                }
                 const cancelButton = document.createElement('button');
                 cancelButton.innerText = 'освободить';
                 cancelButton.onclick = function() {cancellation(office.number)};
@@ -42,6 +48,7 @@ function getOfficeList() {
 
             ul.appendChild(li);
         }
+        totalElement.innerText = `Общая стоимость аренды: ${totalPrice} RUB`;
     })
 }
 function booking(officeNumber){
@@ -133,4 +140,5 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block main %}
     <h1>Список кабинетов</h1>
     <ul id="office-list"></ul>
+    <div id="total-price" style="margin-top: 15px; font-weight: bold; color:blue"></div>
 {% endblock %}
