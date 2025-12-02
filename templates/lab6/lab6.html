@@ -28,7 +28,7 @@ function getOfficeList() {
         for (let i=0; i < office_list.length; i++) {
             const office = office_list[i];
             const li = document.createElement('li');
-            li.innerText = `${office.number}: ${office.tenant || 'свободен'}`;
+            li.innerText = `${office.number}: ${office.tenant || 'свободен'} (${office.price} рублей)`;
 
              if (!office.tenant) {
                 const bookingButton = document.createElement('button');
@@ -48,7 +48,7 @@ function getOfficeList() {
 
             ul.appendChild(li);
         }
-        totalElement.innerText = `Общая стоимость аренды: ${totalPrice} RUB`;
+        totalElement.innerText = `Итоговая стоимость аренды кабинетов: ${totalPrice} руб.`;
     })
 }
 function booking(officeNumber){
