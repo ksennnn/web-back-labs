@@ -14,7 +14,6 @@
     table {
         width: 90%;
         margin: 0 auto;
-        border-collapse: collapse;
         background: white;
         border-radius: 10px;
         overflow: hidden;
@@ -39,7 +38,7 @@
         padding: 9px 15px;
         font-size: 15px;
         font-weight: 500;
-        transition: 0.2s;
+        margin: auto;        
     }
 
     .modal {
@@ -54,18 +53,13 @@
         padding: 25px;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        animation: fadeIn 0.25s ease;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translate(-50%, -55%); }
-        to   { opacity: 1; transform: translate(-50%, -50%); }
     }
 
     label {
         display: block;
         margin-bottom: 12px;
         font-size: 15px;
+        text-align: center;
     }
 
     input, textarea {
@@ -97,7 +91,8 @@
     <table>
         <thead>
             <tr>
-                <th colspan="2">Название</th>
+                <th>Название на русском</th>
+                <th>Оригинальное название</th>
                 <th>Год</th>
                 <th>Действие</th>
             </tr>
