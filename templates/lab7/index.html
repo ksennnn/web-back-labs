@@ -5,20 +5,88 @@
 {% block script %}
 <script src="{{ url_for('static', filename='lab7/main.js')}}"></script>
 <style>
+    h1 {
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+
+    table {
+        width: 90%;
+        margin: 0 auto;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    thead {
+        background: #4b79a1;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid #e1e1e1;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        border-radius: 6px;
+        padding: 9px 15px;
+        font-size: 15px;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+
     .modal {
         display: none;
         z-index: 100;
-        box-shadow: 3px 3px 5px black;
-        background: white;
-        width: 400px;
+        background: #ffffff;
+        width: 420px;
         left: 50%;
-        top: 220px;
-        margin-left: 200px;
-        position: absolute;
-        padding: 20px;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        position: fixed;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        animation: fadeIn 0.25s ease;
     }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translate(-50%, -55%); }
+        to   { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    label {
+        display: block;
+        margin-bottom: 12px;
+        font-size: 15px;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 7px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        min-height: 85px;
+        resize: vertical;
+    }
+
     .error-message {
-        color: red;
+        color: #d10000;
+        font-size: 13px;
+        margin-top: 4px;
     }
 </style>
 {% endblock %}
