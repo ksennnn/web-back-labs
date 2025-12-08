@@ -21,7 +21,7 @@
     }
 
     thead {
-        background: #4b79a1;
+        background: #a14b58;
         color: white;
     }
 
@@ -38,9 +38,22 @@
         padding: 9px 15px;
         font-size: 15px;
         font-weight: 500;
-        margin: auto;        
+        margin: auto;
+        background: #a14b58;
+        color: white;  
+    }
+    button[onclick="addFilm()"] {
+        display: block;
+        margin: 25px auto;
     }
 
+    button[onclick="sendFilm()"] {
+        margin-right: 10px;
+    }
+    button[onclick="cancel()"] {
+        color:#56272e;
+        background: #ddd;
+    }
     .modal {
         display: none;
         z-index: 100;
