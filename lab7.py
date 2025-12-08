@@ -70,3 +70,10 @@ def put_film(id):
     if id < 0 or id >= len(films):
         abort(404)
     return films[id]
+
+
+@lab7.route('/lab7/rest-api/films/', methods=['POST'])
+def add_film():
+    film = request.get_json()
+    films[id] = film
+    return {'id': len(films) - 1}, 201
