@@ -77,3 +77,9 @@ def add_film():
     film = request.get_json()
     films[id] = film
     return {'id': len(films) - 1}, 201
+
+
+
+@lab7.route('/lab7/rest-api/films/', methods=['GET'])
+def get_all_films():
+    return films
