@@ -94,6 +94,11 @@ function sendFilm() {
     const url = `/lab7/rest-api/films/${id}`;
     const method = id === '' ? 'POST' : 'PUT';
 
+    document.getElementById('description-error').innerText = '';
+    document.getElementById('title-error').innerText = '';
+    document.getElementById('year-error').innerText = '';
+    document.getElementById('title-ru-error').innerText = '';
+
     fetch(url, {
         method: method,
         headers: { "Content-Type": "application/json" },
