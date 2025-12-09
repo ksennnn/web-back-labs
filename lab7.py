@@ -37,6 +37,41 @@ def main():
     return render_template('lab7/index.html')
 
 
+def validate_film_data(film):
+    errors = {}
+    
+    title_ru = film.get('title_ru', '').strip()
+    if not title_ru:
+        errors['title_ru'] = 'Русское название обязательно для заполнения'
+    
+    title = film.get('title', '').strip()
+    if not title and not title_ru:
+        errors['title'] = 'Хотя бы одно название должно быть заполнено'
+    
+    year_str = film.get('year', '')
+    current_year = datetime.now().year
+    
+    if not year_str:
+        errors['year'] = 'Год обязателен для заполнения'
+    else:
+        try:
+            year = int(year_str)
+            if year < 1895:
+                errors['year'] = f'Год должен быть не раньше 1895'
+            elif year > current_year:
+                errors['year'] = f'Год не может быть больше текущего ({current_year})'
+        except (ValueError, TypeError):
+            errors['year'] = 'Год должен быть числом'
+    
+    description = film.get('description', '').strip()
+    if not description:
+        errors['description'] = 'Описание обязательно для заполнения'
+    elif len(description) > 2000:
+        errors['description'] = f'Описание не должно превышать 2000 символов (сейчас {len(description)})'
+    
+    return errors
+
+
 @lab7.route('/lab7/rest-api/films/', methods=['GET'])
 def get_films():
     conn, cur = db_connect()
@@ -115,48 +150,46 @@ def del_film(id):
 @lab7.route('/lab7/rest-api/films/<int:id>', methods=['PUT'])
 def put_film(id):
     film = request.get_json()
-    if film['description'] == '':
-        return {'description': 'Заполните описание'}, 400
-    if len(film['description']) > 2000:
-        return {'description': 'Описание не должно превышать 2000 символов'}, 400
+    errors = validate_film_data(film)
+    if errors:
+        return errors, 400  
     
-    if film['title'] == '':
+    if film.get('title', '').strip() == '' and film.get('title_ru', '').strip() != '':
         film['title'] = film['title_ru']
     
-    if film['title'] == '' and film['title_ru'] == '':
-        return {'title': 'Заполните название'}, 400
-
-    if film['title_ru'] == '':
-        return {'title_ru': 'Заполните название'}, 400
-
-    current_year = datetime.now().year
-
-    if 'year' not in film or film['year'].strip() == '' or not film['year'].isdigit():
-        return {'year': 'Год должен быть числом'}, 400
-
-    year = int(film['year'])
-    if year < 1895 or year > current_year:
-        return {'year': f'Введите год от 1895 до {current_year}'}, 400
-    
     conn, cur = db_connect()
+    
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("UPDATE films SET title=%s, title_ru=%s, year=%s, description=%s WHERE id=%s RETURNING *;", 
-                    (film['title'], film['title_ru'], film['year'], film['description'], id))
-        updated = cur.fetchone()
-        conn.commit()
+        cur.execute("SELECT id FROM films WHERE id = %s", (id,))
     else:
-        cur.execute("UPDATE films SET title=?, title_ru=?, year=?, description=? WHERE id=?;", 
-                    (film['title'], film['title_ru'], film['year'], film['description'], id))
-        conn.commit()
-
-        cur.execute("SELECT * FROM films WHERE id=?;", (id,))
+        cur.execute("SELECT id FROM films WHERE id = ?", (id,))
+    
+    exists = cur.fetchone()
+    
+    if not exists:
+        db_close(conn, cur)
+        abort(404, description=f"Фильм с ID {id} не найден")
+    
+    if current_app.config['DB_TYPE'] == 'postgres':
+        cur.execute("""
+            UPDATE films 
+            SET title = %s, title_ru = %s, year = %s, description = %s 
+            WHERE id = %s 
+            RETURNING id, title, title_ru, year, description
+        """, (film['title'], film['title_ru'], film['year'], film['description'], id))
         updated = cur.fetchone()
-
-    if updated is None:
-        abort(404)
+    else:
+        cur.execute("""
+            UPDATE films 
+            SET title = ?, title_ru = ?, year = ?, description = ? 
+            WHERE id = ?
+        """, (film['title'], film['title_ru'], film['year'], film['description'], id))
+        
+        cur.execute("SELECT id, title, title_ru, year, description FROM films WHERE id = ?", (id,))
+        updated = cur.fetchone()
     
     db_close(conn, cur)
-
+    
     return {
         "id": updated["id"],
         "title": updated["title"],
@@ -169,44 +202,29 @@ def put_film(id):
 @lab7.route('/lab7/rest-api/films/', methods=['POST'])
 def add_film():
     film = request.get_json()
-    if film['description'] == '':
-        return {'description': 'Заполните описание'}, 400
-    if len(film['description']) > 2000:
-        return {'description': 'Описание не должно превышать 2000 символов'}, 400
+    errors = validate_film_data(film)
+    if errors:
+        return errors, 400 
     
-    if film['title'] == '':
+    if film.get('title', '').strip() == '' and film.get('title_ru', '').strip() != '':
         film['title'] = film['title_ru']
-
-    if film['title'] == '' and film['title_ru'] == '':
-        return {'title': 'Заполните название'}, 400
-
-    if film['title_ru'] == '':
-        return {'title_ru': 'Заполните название'}, 400
     
-    current_year = datetime.now().year
-
-    if 'year' not in film or film['year'].strip() == '' or not film['year'].isdigit():
-        return {'year': 'Год должен быть числом'}, 400
-
-    year = int(film['year'])
-    if year < 1895 or year > current_year:
-        return {'year': f'Введите год от 1895 до {current_year}'}, 400
-        
-
     conn, cur = db_connect()
 
     if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("INSERT INTO films (title, title_ru, year, description) VALUES (%s, %s, %s, %s) RETURNING id;", 
-                    (film['title'], film['title_ru'], film['year'], film['description']))
+        cur.execute("""
+            INSERT INTO films (title, title_ru, year, description) 
+            VALUES (%s, %s, %s, %s) 
+            RETURNING id
+        """, (film['title'], film['title_ru'], film['year'], film['description']))
         new_id = cur.fetchone()['id']
-        conn.commit()
     else:
-        cur.execute("INSERT INTO films (title, title_ru, year, description) VALUES (?, ?, ?, ?);", 
-                    (film['title'], film['title_ru'], film['year'], film['description']))
-
-        conn.commit()
+        cur.execute("""
+            INSERT INTO films (title, title_ru, year, description) 
+            VALUES (?, ?, ?, ?)
+        """, (film['title'], film['title_ru'], film['year'], film['description']))
         new_id = cur.lastrowid
-
+    
     db_close(conn, cur)
-
-    return {'id': new_id}, 201
+    
+    return {'id': new_id}, 201  
