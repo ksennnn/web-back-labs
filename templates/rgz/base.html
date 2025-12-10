@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Кулинарные рецепты{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='rgz/style.css') }}">
+    </head>
+    <body>
+        <header>
+            <div class="container">
+                <h1>Кулинарные рецепты</h1>
+                <nav>
+                    <a href="{{ url_for('rgz.index') }}">Главная</a>
+                    <a href="{{ url_for('rgz.all_recipes') }}">Все рецепты</a>
+                    <a href="{{ url_for('rgz.search') }}">Поиск</a>
+                    
+                    {% if session.get('login1') %}
+                        {% if session.get('is_admin') %}
+                            <a href="{{ url_for('rgz.add_recipe') }}">Добавить рецепт</a>
+                        {% endif %}
+                        <span class="user-info">
+                            {{ session.get('login1') }}
+                            <form action="{{ url_for('rgz.logout') }}" method="get" style="display:inline;">
+                                <button type="submit" class="logout-btn">Выйти</button>
+                            </form>
+                            <form action="{{ url_for('rgz.delete_account') }}" method="post" style="display:inline;">
+                                <button type="submit" class="delete-btn" onclick="return confirm('Удалить аккаунт?')">Удалить аккаунт</button>
+                            </form>
+                        </span>
+                    {% else %}
+                        <a href="{{ url_for('rgz.login') }}">Войти</a>
+                        <a href="{{ url_for('rgz.register') }}">Регистрация</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <div class="flash">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>Ковалёва Ксения Николаевна, ФБИ-32</p>
+                <p>&copy; 2025 Кулинарные рецепты</p>
+            </div>
+        </footer>
+    </body>
+</html>

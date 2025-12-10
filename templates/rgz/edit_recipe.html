@@ -1,0 +1,40 @@
+{% extends "rgz/base.html" %}
+
+{% block content %}
+<h2>Редактировать рецепт</h2>
+
+{% if errors %}
+<div class="errors">
+    {% for error in errors %}
+    <div class="error">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form method="post" class="recipe-form">
+    <div class="form-group">
+        <label for="title">Название рецепта *</label>
+        <input type="text" id="title" name="title" value="{{ recipe.title }}" required minlength="3" maxlength="100">
+    </div>
+    
+    <div class="form-group">
+        <label for="ingredients">Ингредиенты *</label>
+        <textarea id="ingredients" name="ingredients" rows="6" required>{{ recipe.ingredients }}</textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="steps">Шаги приготовления *</label>
+        <textarea id="steps" name="steps" rows="10" required>{{ recipe.steps }}</textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="photo_url">URL фотографии</label>
+        <input type="url" id="photo_url" name="photo_url" value="{{ recipe.photo_url or '' }}">
+    </div>
+    
+    <div class="form-actions">
+        <button type="submit" class="btn-submit">Сохранить изменения</button>
+        <a href="{{ url_for('rgz.view_recipe', recipe_id=recipe.id) }}" class="btn-cancel">Отмена</a>
+    </div>
+</form>
+{% endblock %}

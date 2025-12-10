@@ -1,29 +1,41 @@
-{% extends 'rgz.html' %}
-{% block main %}
-  <div class="recipe-single">
-    <h2>{{ recipe['title'] }}</h2>
-    {% if recipe.get('photo_url') %}
-      <img src="{{ recipe['photo_url'] }}" alt="{{ recipe['title'] }}" class="recipe-photo">
-    {% endif %}
-    {% if recipe.get('description') %}
-      <p class="muted">{{ recipe['description'] }}</p>
-    {% endif %}
-    <h3>Ингредиенты</h3>
-    <ul>
-      {% for ing in ingredients %}
-        <li>{{ ing['name'] }}{% if ing.get('amount') %} — {{ ing['amount'] }}{% endif %}</li>
-      {% endfor %}
-    </ul>
-    <h3>Шаги приготовления</h3>
-    <pre class="steps">{{ recipe['steps'] }}</pre>
+{% extends "rgz/base.html" %}
 
-    {% if is_admin %}
-      <div style="margin-top:12px;">
-        <a href="/rgz/admin/edit/{{ recipe['id'] }}" class="btn-main">Редактировать</a>
-        <form action="/rgz/admin/delete/{{ recipe['id'] }}" method="post" style="display:inline;">
-          <button class="btn-delete" onclick="return confirm('Удалить рецепт?');">Удалить</button>
-        </form>
-      </div>
+{% block content %}
+<div class="recipe-full">
+    <div class="recipe-header">
+        <h2>{{ recipe.title }}</h2>
+        {% if session.get('is_admin') %}
+        <div class="admin-actions">
+            <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
+            <form action="{{ url_for('rgz.delete_recipe', recipe_id=recipe.id) }}" method="post" style="display:inline;">
+                <button type="submit" class="btn-delete" onclick="return confirm('Удалить рецепт?')">Удалить</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="recipe-meta">
+        <span>Добавлено: {{ recipe.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+    </div>
+    
+    {% if recipe.photo_url %}
+    <div class="recipe-photo">
+        <img src="{{ recipe.photo_url }}" alt="{{ recipe.title }}">
+    </div>
     {% endif %}
-  </div>
+    
+    <div class="recipe-ingredients">
+        <h3>Ингредиенты:</h3>
+        <pre>{{ recipe.ingredients }}</pre>
+    </div>
+    
+    <div class="recipe-steps">
+        <h3>Шаги приготовления:</h3>
+        <pre>{{ recipe.steps }}</pre>
+    </div>
+    
+    <div class="back-link">
+        <a href="{{ url_for('rgz.all_recipes') }}">← Вернуться ко всем рецептам</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,27 +1,44 @@
-{% extends 'rgz.html' %}
-{% block main %}
-  <h2>Результаты поиска</h2>
-  {% if q_title %}
-    <div>По названию: <b>{{ q_title }}</b></div>
-  {% endif %}
-  {% if ingredients %}
-    <div>По ингредиентам: <b>{{ ingredients|join(', ') }}</b></div>
-  {% endif %}
-  <div class="grid">
-    {% for r in recipes %}
-      <div class="card">
-        {% if r.photo_url %}
-          <div class="thumb"><img src="{{ r.photo_url }}" alt="{{ r.title }}"></div>
-        {% endif %}
-        <div class="card-body">
-          <h3><a href="/rgz/recipe/{{ r['id'] }}">{{ r['title'] }}</a></h3>
-          <div class="card-actions">
-            <a href="/rgz/recipe/{{ r['id'] }}" class="btn-main">Открыть</a>
-          </div>
+{% extends "rgz/base.html" %}
+
+{% block content %}
+<h2>Результаты поиска</h2>
+
+{% if search_query %}
+<p>Поиск по запросу: "<strong>{{ search_query }}</strong>"</p>
+{% elif ingredients %}
+<p>Поиск по ингредиентам: "<strong>{{ ingredients }}</strong>" (режим: {{ "все ингредиенты" if search_mode == "all" else "хотя бы один" }})</p>
+{% endif %}
+
+<div class="back-link">
+    <a href="{{ url_for('rgz.search') }}">← Новый поиск</a>
+</div>
+
+{% if recipes %}
+<div class="recipes-list">
+    {% for recipe in recipes %}
+    <div class="recipe-item">
+        <div class="recipe-header">
+            <h3><a href="{{ url_for('rgz.view_recipe', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h3>
         </div>
-      </div>
-    {% else %}
-      <p>Рецептов не найдено.</p>
+        
+        <div class="recipe-content">
+            {% if recipe.photo_url %}
+            <div class="recipe-image">
+                <img src="{{ recipe.photo_url }}" alt="{{ recipe.title }}">
+            </div>
+            {% endif %}
+            
+            <div class="recipe-details">
+                <h4>Ингредиенты:</h4>
+                <p>{{ recipe.ingredients[:200] }}{% if recipe.ingredients|length > 200 %}...{% endif %}</p>
+            </div>
+        </div>
+    </div>
     {% endfor %}
-  </div>
+</div>
+{% else %}
+<div class="no-results">
+    <p>По вашему запросу ничего не найдено.</p>
+</div>
+{% endif %}
 {% endblock %}

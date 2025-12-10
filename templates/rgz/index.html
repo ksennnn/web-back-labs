@@ -1,31 +1,40 @@
-{% extends 'rgz.html' %}
-{% block main %}
-  <h2>Последние рецепты</h2>
+{% extends "rgz/base.html" %}
 
-  <div class="grid">
-    {% for r in recipes %}
-      <div class="card">
-        {% if r.photo_url %}
-          <div class="thumb">
-            <img src="{{ r.photo_url }}" alt="{{ r.title }}">
-          </div>
+{% block content %}
+<h2>Добро пожаловать на сайт кулинарных рецептов!</h2>
+
+<div class="welcome">
+    <p>Здесь вы найдете более 100 рецептов различных блюд. Вы можете:</p>
+    <ul>
+        <li>Просматривать все рецепты</li>
+        <li>Искать рецепты по названию или ингредиентам</li>
+        <li>Зарегистрироваться для получения дополнительных возможностей</li>
+        {% if session.get('is_admin') %}
+            <li>Добавлять, редактировать и удалять рецепты (администратор)</li>
         {% endif %}
-        <div class="card-body">
-          <h3><a href="/rgz/recipe/{{ r['id'] }}">{{ r['title'] }}</a></h3>
-          {% if r.get('description') %}
-            <p class="muted">{{ r['description'] }}</p>
-          {% endif %}
-          <div class="card-actions">
-            <a href="/recipe/{{ r['id'] }}" class="btn-main">Открыть</a>
-            {% if is_admin %}
-              <a href="/rgz/admin/edit/{{ r['id'] }}" class="btn-alt">Редактировать</a>
-              <form action="/rgz/admin/delete/{{ r['id'] }}" method="post" style="display:inline;">
-                <button class="btn-delete" type="submit" onclick="return confirm('Удалить рецепт?');">Удалить</button>
-              </form>
-            {% endif %}
-          </div>
+    </ul>
+</div>
+
+<h3>Последние рецепты:</h3>
+<div class="recipes-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card">
+        {% if recipe.photo_url %}
+        <img src="{{ recipe.photo_url }}" alt="{{ recipe.title }}">
+        {% else %}
+        <div class="no-photo">Нет фото</div>
+        {% endif %}
+        <h4><a href="{{ url_for('rgz.view_recipe', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h4>
+        <p class="ingredients-preview">{{ recipe.ingredients[:100] }}...</p>
+        {% if session.get('is_admin') %}
+        <div class="admin-actions">
+            <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
+            <form action="{{ url_for('rgz.delete_recipe', recipe_id=recipe.id) }}" method="post" style="display:inline;">
+                <button type="submit" class="btn-delete" onclick="return confirm('Удалить рецепт?')">Удалить</button>
+            </form>
         </div>
-      </div>
+        {% endif %}
+    </div>
     {% endfor %}
-  </div>
+</div>
 {% endblock %}
