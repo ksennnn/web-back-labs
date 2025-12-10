@@ -78,7 +78,7 @@ def admin_required(f):
     def wrapper(*args, **kwargs):
         login = session.get('login')
         if not login or not is_admin_user(login):
-            return redirect(url_for('login'))
+            return redirect(url_for('rgz.login'))
         return f(*args, **kwargs)
     return wrapper
 
@@ -235,7 +235,7 @@ def register():
         cur.execute("INSERT INTO userss (login, password, full_name, is_admin) VALUES (?, ?, ?, 0);", (login_in, password_hash, full_name))
     db_close(conn, cur)
     flash('Регистрация пройдена. Войдите в систему.')
-    return redirect(url_for('login'))
+    return redirect(url_for('rgz.login'))
 
 @rgz.route('/rgz/login', methods=['GET','POST'])
 def login():
@@ -257,18 +257,18 @@ def login():
     # ставим в сессию логин
     session['login'] = login_in
     db_close(conn, cur)
-    return redirect(url_for('index'))
+    return redirect(url_for('rgz.index'))
 
 @rgz.route('/rgz/logout')
 def logout():
     session.pop('login', None)
-    return redirect(url_for('index'))
+    return redirect(url_for('rgz.index'))
 
 @rgz.route('/rgz/delete_account', methods=['POST'])
 def delete_account():
     login_in = session.get('login')
     if not login_in:
-        return redirect(url_for('login'))
+        return redirect(url_for('rgz.login'))
     conn, cur = db_connect()
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("DELETE FROM userss WHERE login=%s;", (login_in,))
@@ -277,7 +277,7 @@ def delete_account():
     db_close(conn, cur)
     session.pop('login', None)
     flash('Аккаунт удалён.')
-    return redirect(url_for('index'))
+    return redirect(url_for('rgz.index'))
 
 # === Админ: CRUD для рецептов ===
 @rgz.route('/rgz/admin/recipes')
@@ -341,7 +341,7 @@ def admin_add():
                 iid = cur.lastrowid
             cur.execute("INSERT OR IGNORE INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?,?);", (recipe_id, iid))
     db_close(conn, cur)
-    return redirect(url_for('admin_recipes'))
+    return redirect(url_for('rgz.admin_recipes'))
 
 @rgz.route('/rgz/admin/edit/<int:recipe_id>', methods=['GET','POST'])
 @admin_required
@@ -399,7 +399,7 @@ def admin_edit(recipe_id):
                 iid = cur.lastrowid
             cur.execute("INSERT OR IGNORE INTO recipe_ingredients (recipe_id, ingredient_id) VALUES (?,?);", (recipe_id, iid))
     db_close(conn, cur)
-    return redirect(url_for('admin_recipes'))
+    return redirect(url_for('rgz.admin_recipes'))
 
 @rgz.route('/rgz/admin/delete/<int:recipe_id>', methods=['POST'])
 @admin_required
@@ -410,4 +410,4 @@ def admin_delete(recipe_id):
     else:
         cur.execute("DELETE FROM recipes WHERE id=?;", (recipe_id,))
     db_close(conn, cur)
-    return redirect(url_for('admin_recipes'))
+    return redirect(url_for('rgz.admin_recipes'))
