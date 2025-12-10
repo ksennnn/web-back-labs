@@ -1,0 +1,23 @@
+{% extends 'rgz.html' %}
+{% block main %}
+  <h2>Добавить рецепт</h2>
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="post" class="edit-form">
+    <label>Название</label>
+    <input type="text" name="title" required>
+
+    <label>Ингредиенты (через запятую)</label>
+    <input type="text" name="ingredients" placeholder="мука, яйцо, соль" required>
+
+    <label>Шаги приготовления</label>
+    <textarea name="steps" rows="8" required></textarea>
+
+    <label>URL изображения (photo URL)</label>
+    <input type="url" name="photo" placeholder="https://...">
+
+    <button class="btn-main" type="submit">Добавить</button>
+    <a href="/rgz/admin/recipes" class="btn-alt">Отмена</a>
+  </form>
+{% endblock %}

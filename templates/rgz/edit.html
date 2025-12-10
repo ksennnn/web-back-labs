@@ -1,0 +1,21 @@
+{% extends 'rgz.html' %}
+{% block main %}
+  <h2>Редактировать рецепт</h2>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post" class="edit-form">
+    <label>Название</label>
+    <input type="text" name="title" value="{{ recipe['title'] }}" required>
+
+    <label>Ингредиенты (через запятую)</label>
+    <input type="text" name="ingredients" value="{{ ingredients_str }}">
+
+    <label>Шаги приготовления</label>
+    <textarea name="steps" rows="8" required>{{ recipe['steps'] }}</textarea>
+
+    <label>URL изображения (photo URL)</label>
+    <input type="url" name="photo" value="{{ recipe.get('photo_url','') }}">
+
+    <button class="btn-main" type="submit">Сохранить</button>
+    <a href="/rgz/admin/recipes" class="btn-alt">Отмена</a>
+  </form>
+{% endblock %}

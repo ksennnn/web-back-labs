@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+    <meta charset="utf-8">
+    <title>Рецепты — уютная кухня</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="/static/rgz/style.css">
+    </head>
+    <body>
+        <header class="navbar">
+            <div class="container">
+            <a class="brand" href="/">Рецепты</a>
+            <nav class="navlinks">
+                <a class="nav-link" href="/rgz/">Главная</a>
+                <a class="nav-link" href="/rgz/search">Поиск</a>
+                {% if not login %}
+                <a class="nav-link" href="/rgz/register">Регистрация</a>
+                <a class="nav-link" href="/rgz/login">Вход</a>
+                {% else %}
+                <span class="nav-user">Привет, {{ login }}</span>
+                <a class="nav-link" href="/rgz/logout">Выйти</a>
+                <form action="/rgz/delete_account" method="post" style="display:inline;">
+                    <button class="btn-small" type="submit" onclick="return confirm('Удалить аккаунт?');">Удалить аккаунт</button>
+                </form>
+                {% endif %}
+                {% if login and is_admin %}
+                <a class="nav-link" href="/rgz/admin/recipes">Админ</a>
+                {% endif %}
+            </nav>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="flash">
+                    {% for m in messages %} <div>{{ m }}</div> {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+            {% block main %}{% endblock %}
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-inner">Ковалёва Ксения Николаевна, ФБИ-32</div>
+        </footer>
+    </body>
+</html>

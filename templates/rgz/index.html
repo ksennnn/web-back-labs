@@ -1,0 +1,31 @@
+{% extends 'rgz.html' %}
+{% block main %}
+  <h2>Последние рецепты</h2>
+
+  <div class="grid">
+    {% for r in recipes %}
+      <div class="card">
+        {% if r.photo_url %}
+          <div class="thumb">
+            <img src="{{ r.photo_url }}" alt="{{ r.title }}">
+          </div>
+        {% endif %}
+        <div class="card-body">
+          <h3><a href="/rgz/recipe/{{ r['id'] }}">{{ r['title'] }}</a></h3>
+          {% if r.get('description') %}
+            <p class="muted">{{ r['description'] }}</p>
+          {% endif %}
+          <div class="card-actions">
+            <a href="/recipe/{{ r['id'] }}" class="btn-main">Открыть</a>
+            {% if is_admin %}
+              <a href="/rgz/admin/edit/{{ r['id'] }}" class="btn-alt">Редактировать</a>
+              <form action="/rgz/admin/delete/{{ r['id'] }}" method="post" style="display:inline;">
+                <button class="btn-delete" type="submit" onclick="return confirm('Удалить рецепт?');">Удалить</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

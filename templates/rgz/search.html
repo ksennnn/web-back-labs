@@ -1,0 +1,19 @@
+{% extends 'rgz.html' %}
+{% block main %}
+  <h2>Поиск рецептов</h2>
+  <form method="post" class="search-form">
+    <label>Название (частично)</label>
+    <input type="text" name="title" placeholder="Например: пельмени">
+
+    <label>Ингредиенты (через запятую)</label>
+    <input type="text" name="ingredients" placeholder="например: мука, яйцо, соль">
+
+    <label>Режим поиска по ингредиентам</label>
+    <select name="mode">
+      <option value="any">Хотя бы один из ингредиентов</option>
+      <option value="all">Должны быть все ингредиенты</option>
+    </select>
+
+    <button class="btn-main" type="submit">Поиск</button>
+  </form>
+{% endblock %}

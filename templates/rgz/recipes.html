@@ -1,0 +1,26 @@
+{% extends 'rgz.html' %}
+{% block main %}
+  <h2>Админ — рецепты</h2>
+  <div style="margin-bottom:12px;">
+    <a href="/rgz/admin/add" class="btn-main">Добавить рецепт</a>
+    <a href="/" class="btn-alt">На сайт</a>
+  </div>
+
+  <div class="admin-list">
+    {% for r in recipes %}
+      <div class="admin-item card">
+        <div class="admin-item-left">
+          <strong>{{ r['title'] }}</strong><br>
+          <span class="muted">id: {{ r['id'] }} | автор: {{ r.get('author') }}</span>
+        </div>
+        <div class="admin-item-right">
+          <a href="/admin/edit/{{ r['id'] }}" class="btn-alt">Редактировать</a>
+          <form action="/admin/delete/{{ r['id'] }}" method="post" style="display:inline;">
+            <button class="btn-delete" onclick="return confirm('Удалить рецепт?');">Удалить</button>
+          </form>
+          <a href="/rgz/recipe/{{ r['id'] }}" class="btn-main">Открыть</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
