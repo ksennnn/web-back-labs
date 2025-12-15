@@ -3,70 +3,75 @@
 {% block lab %}Лабораторная работа 8{% endblock %}
 
 {% block main %}
-<style>
-    .articles {
-        max-width: 800px;
-    }
-    .article {
-        background: #f4f1ee;
-        border: 1px solid #c8b7a6;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 15px;
-    }
-    .article-title {
-        font-weight: bold;
-        font-size: 18px;
-    }
-    .buttons button {
-        margin-right: 5px;
-        padding: 5px 10px;
-        border-radius: 6px;
-        border: none;
-        background: #482f1e;
-        color: beige;
-        cursor: pointer;
-    }
-    .favorite {
-        color: red;
-        font-weight: bold;
-    }
-</style>
-
     <h1>Список статей</h1>
 
-    <div class="articles">
-    {% for article in articles %}
-        <div class="article">
-            <div class="article-title">{{ article.title }}</div>
-            <p>{{ article.article_text }}</p>
-            <p>Автор ID: {{ article.login_id }}</p>
-            <p>
-                {% if article.is_public %}
-                    Публичная
-                {% else %}
-                    Приватная
-                {% endif %}
-            </p>
+    {% if current_user.is_authenticated %}
+<a href="/lab8/create" style="display: inline-block; padding: 10px 15px; background: #037b1fce; color: rgb(0, 0, 0); text-decoration: none; border-radius: 4px; margin-bottom: 20px;">+ Создать статью</a>
+{% endif %}
 
-            {% if article.login_id == current_user.id %}
-                {% if article.is_favorite %}
-                    <div class="favorite">★ В избранном</div>
-                {% endif %}
-                <div class="buttons">
-                    <form action="/lab8/edit/{{ article.id }}" method="get" style="display:inline;">
-                        <button type="submit">Редактировать</button>
-                    </form>
-                    <form action="/lab8/delete/{{ article.id }}" method="post" style="display:inline;">
-                        <button type="submit">Удалить</button>
-                    </form>
-                </div>
+    <form method="GET" action="/lab8/articles/" style="margin-bottom: 20px;">
+        <input type="text" name="search" value="{{ search }}" placeholder="Поиск">
+        <button type="submit">Искать</button>
+        {% if search %}
+        <a href="/lab8/articles/">Сбросить поиск</a>
+        {% endif %}
+    </form>
+
+    {% if search %}
+        {% if results %}
+        <h2>Результаты поиска "{{ search }}":</h2>
+        {% for article in results %}
+        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+            <h3>{{ article.title }}</h3>
+            <div>
+                {% if current_user.is_authenticated and article.login_id == current_user.id and article.is_favorite %}★В избранном {% endif %}
+                {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
+            </div>
+            <p>{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
+            {% if current_user.is_authenticated and article.login_id == current_user.id %}
+            <div>
+                <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
+                <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
+            </div>
             {% endif %}
         </div>
-    {% else %}
-        <p>Статей пока нет</p>
-    {% endfor %}
-    </div>
+        {% endfor %}
+        {% else %}
+        <p>Ничего не найдено по запросу "{{ search }}"</p>
+        {% endif %}
 
-    <a href="/lab8/">На главную</a>
+    {% else %}
+        {% if current_user.is_authenticated and my_articles %}
+        <h2>Мои статьи</h2>
+        {% for article in my_articles %}
+        <div>
+            <h3 style="margin-top: 0;">{{ article.title }}</h3>
+            <div style="color: #666; margin-bottom: 10px;">
+                {% if article.is_favorite %}★ {% endif %}
+                {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
+            </div>
+            <p>{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
+            <div style="margin-top: 10px;">
+                <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
+                <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% elif current_user.is_authenticated and not my_articles %}
+        <p>У вас пока нет статей. <a href="/lab8/create">Создайте первую!</a></p>
+        {% endif %}
+
+        {% if public_articles %}
+        <h2>{% if current_user.is_authenticated %}Публичные статьи других{% else %}Публичные статьи{% endif %}</h2>
+        {% for article in public_articles %}
+        <div>
+            <h3>{{ article.title }}</h3>
+            <p>{{ article.article_text[:300] }}{% if article.article_text|length > 300 %}...{% endif %}</p>
+        </div>
+        {% endfor %}
+        {% endif %}
+    {% endif %}
+    <div>
+        <a href="/lab8/">На главную</a>
+    </div>
 {% endblock %}

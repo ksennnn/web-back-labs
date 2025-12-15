@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, request, session
 from db import db
 from db.models import users, articles
 from flask_login import login_user, login_required, current_user, logout_user
+from sqlalchemy import or_
 from os import path
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -32,12 +33,11 @@ def register():
         return render_template('lab8/register.html', error='Введите пароль')
 
     
-    password_hash = generate_password_hash(password_form)
-    new_user = users(login = login_form, password = password_hash)
+    new_user = users(login=login_form, password=generate_password_hash(password_form))
     db.session.add(new_user)
     db.session.commit()
 
-    login_user(new_user)
+    login_user(new_user, remember=False)
     return redirect('/lab8/')
 
 
@@ -48,19 +48,14 @@ def login():
     
     login_form = request.form.get('login')
     password_form = request.form.get('password')
-    remember = request.form.get('galka') == 'on'
+    remember = request.form.get('remember') == 'on'
     
-    if not login_form or not login_form.strip():
-        return render_template('lab8/login.html', error='Введите логин')
+    if not login_form or not password_form:
+        return render_template('lab8/login.html', error='Заполните все поля')
     
-    if not password_form or not password_form.strip():
-        return render_template('lab8/login.html', error='Введите пароль')
-    
-    user = users.query.filter_by(login = login_form).first()
-    if user:
-        if check_password_hash(user.password, password_form):
-            login_user(user, remember=remember)
-            return redirect('/lab8/')
+    user = users.query.filter_by(login=login_form).first()
+    if user and check_password_hash(user.password, password_form):
+        login_user(user, remember=remember)
 
     return render_template('lab8/login.html', error='Ошибка входа: логин и/или пароль неверны')
 
@@ -73,72 +68,114 @@ def logout():
 
 
 @lab8.route('/lab8/articles')
-@login_required
-def article_list():
-    all_articles = articles.query.filter((articles.is_public == 1) | (articles.login_id == current_user.id)).all()
-    return render_template('lab8/articles.html', articles=all_articles)
+def articles_list():
+    search = request.args.get('search', '').strip()
+    
+    if current_user.is_authenticated:
+        my_articles = articles.query.filter_by(login_id=current_user.id).all()
+        other_public = articles.query.filter(
+            articles.is_public == True,
+            articles.login_id != current_user.id
+        ).all()
+        
+        if search:
+            results = articles.query.filter(
+                or_(
+                    articles.title.ilike(f'%{search}%'),
+                    articles.article_text.ilike(f'%{search}%')
+                ),
+                or_(
+                    articles.is_public == True,
+                    articles.login_id == current_user.id
+                )
+            ).all()
+        else:
+            results = []
+        
+        return render_template('lab8/articles.html',
+            my_articles=my_articles,
+            public_articles=other_public,
+            search=search,
+            results=results)
+    else:
+        public_articles = articles.query.filter_by(is_public=True).all()
+        if search:
+            results = articles.query.filter(
+                or_(
+                    articles.title.ilike(f'%{search}%'),
+                    articles.article_text.ilike(f'%{search}%')
+                ),
+                articles.is_public == True
+            ).all()
+        else:
+            results = []
+        
+        return render_template('lab8/articles.html',
+            public_articles=public_articles,
+            search=search,
+            results=results)
 
 
 @lab8.route('/lab8/create', methods=['GET', 'POST'])
 @login_required
-def create():
+def create_article():
     if request.method == 'GET':
         return render_template('lab8/create.html')
     
-    title_form = request.form.get('title', '').strip()
-    article_text_form = request.form.get('article_text', '').strip()
-    is_public = 1 if request.form.get('is_public') == 'on' else 0
-    is_favorite = True if request.form.get('is_favorite') == 'on' else False
-
-    if not title_form.strip() or not article_text_form.strip():
-        return render_template('lab8/create.html', error="Заполните все поля")
+    title = request.form.get('title')
+    text = request.form.get('article_text')
+    is_public = request.form.get('is_public') == 'on'
+    is_favorite = request.form.get('is_favorite') == 'on'
     
-    new_article = articles(
+    if not title or not text:
+        return render_template('lab8/create.html', error='Заполните все поля')
+    
+    article = articles(
         login_id=current_user.id,
-        title=title_form,
-        article_text=article_text_form,
+        title=title,
+        article_text=text,
+        is_public=is_public,
         is_favorite=is_favorite,
-        is_public=int(is_public)
+        likes=0
     )
-
-    db.session.add(new_article)
+    
+    db.session.add(article)
     db.session.commit()
-    return redirect('/lab8/articles')
+    return redirect('/lab8/articles/')
 
 
-@lab8.route('/lab8/edit/<int:article_id>', methods=['GET', 'POST'])
+@lab8.route('/lab8/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
-def edit_article(article_id):
-    article = articles.query.get(article_id)
+def edit_article(id):
+    article = articles.query.filter_by(id=id, login_id=current_user.id).first()
     if not article:
         return "Статья не найдена", 404
     
     if request.method == 'GET':
         return render_template('lab8/edit.html', article=article)
-
-    title_form = request.form.get('title', '').strip()
-    article_text_form = request.form.get('article_text', '').strip()
-    is_public = 1 if request.form.get('is_public') == 'on' else 0
-    is_favorite = True if request.form.get('is_favorite') == 'on' else False
-
-    if not title_form or not article_text_form:
-        return render_template('lab8/edit.html', article=article, error="Заполните все поля")
-
-    article.title = title_form
-    article.article_text = article_text_form
+    
+    title = request.form.get('title')
+    text = request.form.get('article_text')
+    is_public = request.form.get('is_public') == 'on'
+    is_favorite = request.form.get('is_favorite') == 'on'
+    
+    if not title or not text:
+        return render_template('lab8/edit.html', article=article, error='Заполните все поля')
+    
+    article.title = title
+    article.article_text = text
     article.is_public = is_public
     article.is_favorite = is_favorite
-
     db.session.commit()
-    return redirect('/lab8/articles')
+    
+    return redirect('/lab8/articles/')
 
 
 @lab8.route('/lab8/delete/<int:article_id>', methods=['POST'])
 @login_required
-def delete(article_id):
-    article = articles.query.get(article_id)
-    if not article:
-        return "Статья не найдена", 404
-    db.session.delete(article)
-    db.session.commit()
-    return redirect('/lab8/articles')
+def delete_article(id):
+    article = articles.query.filter_by(id=id, login_id=current_user.id).first()
+    if article:
+        db.session.delete(article)
+        db.session.commit()
+    return redirect('/lab8/articles/')
