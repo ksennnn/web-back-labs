@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, request, session
 from db import db
 from db.models import users, articles
 from flask_login import login_user, login_required, current_user, logout_user
-from sqlalchemy import func
+from sqlalchemy import or_, func
 from os import path
 from werkzeug.security import check_password_hash, generate_password_hash
 
