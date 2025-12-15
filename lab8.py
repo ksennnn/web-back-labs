@@ -1,7 +1,5 @@
 from flask import Blueprint, render_template, request, abort, current_app
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import sqlite3
+
 from os import path
 
 
