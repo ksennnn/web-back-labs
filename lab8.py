@@ -68,7 +68,7 @@ def logout():
     return redirect('/lab8/')
 
 
-@lab8.route('/lab8/articles')
+@lab8.route('/lab8/articles/')
 def articles_list():
     search = request.args.get('search', '').strip()
     
