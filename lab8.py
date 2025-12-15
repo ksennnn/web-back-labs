@@ -71,7 +71,7 @@ def logout():
 
 @lab8.route('/lab8/articles/')
 def articles_list():
-    query = request.args.get('query', '').strip().lower()
+    query = request.args.get('query', '').strip()
     
     if current_user.is_authenticated:
         my_articles = articles.query.filter_by(login_id=current_user.id).all()
@@ -102,10 +102,11 @@ def articles_list():
     else:
         public_articles = articles.query.filter_by(is_public=True).all()
         if query:
+            search_pattern = f"%{query}%"
             results = articles.query.filter(
                 or_(
-                    articles.title.ilike(f'%{query}%'),
-                    articles.article_text.ilike(f'%{query}%')
+                    articles.title.ilike(search_pattern),
+                    articles.article_text.ilike(search_pattern)
                 ),
                 articles.is_public == True
             ).all()
