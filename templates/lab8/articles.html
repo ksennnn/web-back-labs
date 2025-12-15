@@ -6,10 +6,10 @@
     <h1>Список статей</h1>
 
     {% if current_user.is_authenticated %}
-<a href="/lab8/create" style="display: inline-block; padding: 10px 15px; background: #037b1fce; color: rgb(0, 0, 0); text-decoration: none; border-radius: 4px; margin-bottom: 20px;">+ Создать статью</a>
-{% endif %}
+        <a href="/lab8/create" >Создать статью</a>
+    {% endif %}
 
-    <form method="GET" action="/lab8/articles/" style="margin-bottom: 20px;">
+    <form method="GET" action="/lab8/articles/">
         <input type="text" name="search" value="{{ search }}" placeholder="Поиск">
         <button type="submit">Искать</button>
         {% if search %}
@@ -21,7 +21,7 @@
         {% if results %}
         <h2>Результаты поиска "{{ search }}":</h2>
         {% for article in results %}
-        <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+        <div>
             <h3>{{ article.title }}</h3>
             <div>
                 {% if current_user.is_authenticated and article.login_id == current_user.id and article.is_favorite %}★В избранном {% endif %}
@@ -37,7 +37,7 @@
         </div>
         {% endfor %}
         {% else %}
-        <p>Ничего не найдено по запросу "{{ search }}"</p>
+            <p>Ничего не найдено по запросу "{{ search }}"</p>
         {% endif %}
 
     {% else %}
@@ -45,20 +45,20 @@
         <h2>Мои статьи</h2>
         {% for article in my_articles %}
         <div>
-            <h3 style="margin-top: 0;">{{ article.title }}</h3>
-            <div style="color: #666; margin-bottom: 10px;">
+            <h3>{{ article.title }}</h3>
+            <div>
                 {% if article.is_favorite %}★ {% endif %}
                 {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
             </div>
             <p>{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
-            <div style="margin-top: 10px;">
+            <div>
                 <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
                 <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
             </div>
         </div>
         {% endfor %}
         {% elif current_user.is_authenticated and not my_articles %}
-        <p>У вас пока нет статей. <a href="/lab8/create">Создайте первую!</a></p>
+        <p>У вас пока нет статей.</p>
         {% endif %}
 
         {% if public_articles %}
