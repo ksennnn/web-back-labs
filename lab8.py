@@ -70,31 +70,27 @@ def logout():
 
 @lab8.route('/lab8/articles/')
 def articles_list():
-    query = request.args.get('query', '').strip().lower
+    query = request.args.get('query', '').strip().lower()
     
     if current_user.is_authenticated:
-        my_articles = articles.query.filter_by(login_id=current_user.id).all()
-        other_public = articles.query.filter(
-            articles.is_public == True,
-            articles.login_id != current_user.id
+        accessible_articles = articles.query.filter(
+            or_(
+                articles.is_public == True,
+                articles.login_id == current_user.id
+            )
         ).all()
         
         if query:
-            from sqlalchemy import literal
-            
-            search_pattern = f"%{query}%"
-            results = articles.query.filter(
-                or_(
-                    articles.title.op('COLLATE NOCASE')(search_pattern),
-                    articles.article_text.op('COLLATE NOCASE')(search_pattern)
-                ),
-                or_(
-                    articles.is_public == True,
-                    articles.login_id == current_user.id
-                )
-            ).all()
+            results = [
+                article for article in accessible_articles 
+                if query in article.title.lower() or query in article.article_text.lower()
+            ]
         else:
             results = []
+        
+        my_articles = [article for article in accessible_articles if article.login_id == current_user.id]
+        other_public = [article for article in accessible_articles 
+                       if article.is_public == True and article.login_id != current_user.id]
         
         return render_template('lab8/articles.html',
             my_articles=my_articles,
@@ -102,23 +98,18 @@ def articles_list():
             query=query,
             results=results)
     else:
-        public_articles = articles.query.filter_by(is_public=True).all()
+        accessible_articles = articles.query.filter_by(is_public=True).all()
+        
         if query:
-            from sqlalchemy import literal
-            
-            search_pattern = f"%{query}%"
-            results = articles.query.filter(
-                or_(
-                    articles.title.op('COLLATE NOCASE')(search_pattern),
-                    articles.article_text.op('COLLATE NOCASE')(search_pattern)
-                ),
-                articles.is_public == True
-            ).all()
+            results = [
+                article for article in accessible_articles 
+                if query in article.title.lower() or query in article.article_text.lower()
+            ]
         else:
             results = []
         
         return render_template('lab8/articles.html',
-            public_articles=public_articles,
+            public_articles=accessible_articles,
             query=query,
             results=results)
 
