@@ -2,8 +2,7 @@ from flask import Blueprint, render_template, redirect, request, session
 from db import db
 from db.models import users, articles
 from flask_login import login_user, login_required, current_user, logout_user
-from sqlalchemy import or_
-from sqlalchemy import func
+from sqlalchemy import or_, func
 from os import path
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -81,11 +80,11 @@ def articles_list():
         ).all()
         
         if query:
-            search_lower = query.lower()
+            search_lower = f"%{query.lower()}%"
             results = articles.query.filter(
                 or_(
-                    func.lower(articles.title).like(f"%{search_lower}%"),
-                    func.lower(articles.article_text).like(f"%{search_lower}%")
+                    func.lower(articles.title).like(search_lower),
+                    func.lower(articles.article_text).like(search_lower)
                 ),
                 or_(
                     articles.is_public == True,
@@ -103,11 +102,11 @@ def articles_list():
     else:
         public_articles = articles.query.filter_by(is_public=True).all()
         if query:
-            search_lower = query.lower()
+            search_lower = f"%{query.lower()}%"
             results = articles.query.filter(
                 or_(
-                    func.lower(articles.title).like(f"%{search_lower}%"),
-                    func.lower(articles.article_text).like(f"%{search_lower}%")
+                    func.lower(articles.title).like(search_lower),
+                    func.lower(articles.article_text).like(search_lower)
                 ),
                 articles.is_public == True
             ).all()
