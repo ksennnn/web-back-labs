@@ -27,10 +27,7 @@ def register():
         return render_template('lab8/register.html', error='Такой пользователь уже существует')
     
     if not login_form or not login_form.strip():
-        return render_template('lab8/register.html', error='Введите логин')
-    
-    if not password_form or not password_form.strip():
-        return render_template('lab8/register.html', error='Введите пароль')
+        return render_template('lab8/register.html', error='Заполните все поля')
 
     
     new_user = users(login=login_form, password=generate_password_hash(password_form))
