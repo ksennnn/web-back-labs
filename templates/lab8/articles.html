@@ -155,16 +155,16 @@
     {% endif %}
 
     <form method="GET" action="/lab8/articles/" class="search-form">
-        <input type="text" name="search" value="{{ search }}" placeholder="Поиск по статьям...">
+        <input type="text" name="query" value="{{ query }}" placeholder="Найти статью">
         <button type="submit">Искать</button>
         {% if search %}
         <a href="/lab8/articles/" class="reset-link">Сбросить поиск</a>
         {% endif %}
     </form>
 
-    {% if search %}
+    {% if query %}
         {% if results %}
-        <h2>Результаты поиска "{{ search }}":</h2>
+        <h2>Найденные статьи "{{ query }}":</h2>
         {% for article in results %}
         <div class="article-card">
             <h3>{{ article.title }}</h3>
@@ -176,24 +176,24 @@
                     {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
                 </div>
             </div>
-            <p class="article-text">{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
+            <p class="article-text">{{ article.article_text }}</p>
             {% if current_user.is_authenticated and article.login_id == current_user.id %}
             <div class="article-actions">
                 <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
-                <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
+                <a href="/lab8/delete/{{ article.id }}">Удалить</a>
             </div>
             {% endif %}
         </div>
         {% endfor %}
         {% else %}
             <div class="no-articles">
-                <p>Ничего не найдено по запросу "{{ search }}"</p>
+                <p>По запросу ничего не найдено "{{ query }}"</p>
             </div>
         {% endif %}
 
     {% else %}
         {% if current_user.is_authenticated and my_articles %}
-        <h2>Мои статьи</h2>
+        <h2>Личные статьи</h2>
         {% for article in my_articles %}
         <div class="article-card">
             <h3>{{ article.title }}</h3>
@@ -208,22 +208,22 @@
             <p class="article-text">{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
             <div class="article-actions">
                 <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
-                <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
+                <a href="/lab8/delete/{{ article.id }}">Удалить</a>
             </div>
         </div>
         {% endfor %}
         {% elif current_user.is_authenticated and not my_articles %}
         <div class="no-articles">
-            <p>У вас пока нет статей. <a href="/lab8/create" class="create-btn">Создайте первую!</a></p>
+            <p>Вы ещё не создали статью</p>
         </div>
         {% endif %}
 
         {% if public_articles %}
-        <h2>{% if current_user.is_authenticated %}Публичные статьи других пользователей{% else %}Публичные статьи{% endif %}</h2>
+        <h2>Публичные статьи</h2>
         {% for article in public_articles %}
         <div class="article-card">
             <h3>{{ article.title }}</h3>
-            <p class="article-text">{{ article.article_text[:300] }}{% if article.article_text|length > 300 %}...{% endif %}</p>
+            <p class="article-text">{{ article.article_text }}</p>
         </div>
         {% endfor %}
         {% endif %}
