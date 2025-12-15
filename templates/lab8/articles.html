@@ -57,7 +57,7 @@
         border: 1px solid #ddd;
         border-radius: 4px;
         min-width: 200px;
-        max-width: 400px;
+        max-width: 600px;
     }
     
     .search-form button {
@@ -150,17 +150,17 @@
 
     <h1>Список статей</h1>
 
-    {% if current_user.is_authenticated %}
-        <a href="/lab8/create" class="create-btn">Создать статью</a>
-    {% endif %}
-
     <form method="GET" action="/lab8/articles/" class="search-form">
         <input type="text" name="query" value="{{ query }}" placeholder="Найти статью">
         <button type="submit">Искать</button>
-        {% if search %}
+        {% if query %}
         <a href="/lab8/articles/" class="reset-link">Сбросить поиск</a>
         {% endif %}
     </form>
+
+    {% if current_user.is_authenticated %}
+        <a href="/lab8/create" class="create-btn">Создать статью</a>
+    {% endif %}
 
     {% if query %}
         {% if results %}
