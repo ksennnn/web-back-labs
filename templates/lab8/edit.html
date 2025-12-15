@@ -26,36 +26,37 @@
 </style>
 
     <div class="form-box">
-        <h1>Создание статьи</h1>
+        <h1>Редактировать статью</h1>
 
         <form method="post">
             <label>
-                Название статьи:
-                <input type="text" maxlength="50" name="title">
+                Заголовок:
+                <input type="text" name="title" value="{{ article.title }}">
             </label>
 
             <label>
                 Текст статьи:
-                <textarea name="article_text"></textarea>
+                <textarea name="article_text">{{ article.article_text }}</textarea>
             </label>
 
             <label>
-                <input type="checkbox" name="is_public">
-                Сделать публичной
+                <input type="checkbox" name="is_public" {% if article.is_public %}checked{% endif %}>
+                Публичная
             </label>
 
             <label>
-                <input type="checkbox" name="is_favorite">
-                В избранное
+                <input type="checkbox" name="is_favorite" {% if article.is_favorite %}checked{% endif %}>
+                Избранная
             </label>
 
-            <button type="submit">Готово</button>
+            <button type="submit">Сохранить</button>
 
             {% if error %}
-                <p style="color:red">{{ error }}</p>
+                <div style="color:red">{{ error }}</div>
             {% endif %}
         </form>
 
+        <a href="/lab8/articles">Назад</a> |
         <a href="/lab8/">На главную</a>
     </div>
 {% endblock %}

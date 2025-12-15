@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block lab %}Лабораторная работа 8{% endblock %}
+
+{% block main %}
+<style>
+    .articles {
+        max-width: 800px;
+    }
+    .article {
+        background: #f4f1ee;
+        border: 1px solid #c8b7a6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    .article-title {
+        font-weight: bold;
+        font-size: 18px;
+    }
+    .buttons button {
+        margin-right: 5px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: none;
+        background: #482f1e;
+        color: beige;
+        cursor: pointer;
+    }
+    .favorite {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+    <h1>Список статей</h1>
+
+    <div class="articles">
+    {% for article in articles %}
+        <div class="article">
+            <div class="article-title">{{ article.title }}</div>
+            <p>{{ article.article_text }}</p>
+            <p>Автор ID: {{ article.login_id }}</p>
+            <p>
+                {% if article.is_public %}
+                    Публичная
+                {% else %}
+                    Приватная
+                {% endif %}
+            </p>
+
+            {% if article.login_id == current_user.id %}
+                {% if article.is_favorite %}
+                    <div class="favorite">★ В избранном</div>
+                {% endif %}
+                <div class="buttons">
+                    <form action="/lab8/edit/{{ article.id }}" method="get" style="display:inline;">
+                        <button type="submit">Редактировать</button>
+                    </form>
+                    <form action="/lab8/delete/{{ article.id }}" method="post" style="display:inline;">
+                        <button type="submit">Удалить</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>Статей пока нет</p>
+    {% endfor %}
+    </div>
+
+    <a href="/lab8/">На главную</a>
+{% endblock %}

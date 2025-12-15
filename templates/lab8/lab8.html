@@ -27,8 +27,8 @@
 
     <h1>База знаний</h1>
     <div class="user">
-        {% if login %}
-            Пользователь: {{ login  }}
+        {% if current_user.is_authenticated %}
+            {{ current_user.login }}
         {% else %}
             Anonymous
         {% endif %}
