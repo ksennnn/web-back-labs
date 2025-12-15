@@ -81,10 +81,11 @@ def articles_list():
         ).all()
         
         if query:
+            search_lower = query.lower()
             results = articles.query.filter(
                 or_(
-                    articles.title.ilike(f'%{query}%'),
-                    articles.article_text.ilike(f'%{query}%')
+                    func.lower(articles.title).like(f"%{search_lower}%"),
+                    func.lower(articles.article_text).like(f"%{search_lower}%")
                 ),
                 or_(
                     articles.is_public == True,
@@ -102,11 +103,11 @@ def articles_list():
     else:
         public_articles = articles.query.filter_by(is_public=True).all()
         if query:
-            search_pattern = f"%{query}%"
+            search_lower = query.lower()
             results = articles.query.filter(
                 or_(
-                    articles.title.ilike(search_pattern),
-                    articles.article_text.ilike(search_pattern)
+                    func.lower(articles.title).like(f"%{search_lower}%"),
+                    func.lower(articles.article_text).like(f"%{search_lower}%")
                 ),
                 articles.is_public == True
             ).all()
