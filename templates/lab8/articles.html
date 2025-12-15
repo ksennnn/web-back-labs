@@ -3,17 +3,163 @@
 {% block lab %}Лабораторная работа 8{% endblock %}
 
 {% block main %}
+<style>
+    h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-top: 0;
+    }
+    
+    h2 {
+        color: #34495e;
+        margin-top: 30px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    
+    h3 {
+        color: #16a085;
+        margin-bottom: 10px;
+        margin-top: 0;
+    }
+    
+    .create-btn {
+        display: inline-block;
+        background-color: #2ecc71;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        margin: 15px 0;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+    
+    .create-btn:hover {
+        background-color: #27ae60;
+    }
+    
+    .search-form {
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin: 20px 0;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-form input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        min-width: 200px;
+        max-width: 400px;
+    }
+    
+    .search-form button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    .reset-link {
+        color: #e74c3c;
+        text-decoration: none;
+        margin-left: 15px;
+    }
+    
+    .article-card {
+        background-color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #3498db;
+    }
+    
+    .article-meta {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+    
+    .public-badge {
+        background-color: #d5f4e6;
+        color: #27ae60;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+    
+    .private-badge {
+        background-color: #f4d5d5;
+        color: #c0392b;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+    
+    .favorite-badge {
+        color: #f39c12;
+        font-weight: bold;
+    }
+    
+    .article-text {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    .article-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .article-actions a {
+        color: #3498db;
+        text-decoration: none;
+        padding: 5px 15px;
+        border: 1px solid #3498db;
+        border-radius: 4px;
+        transition: all 0.3s;
+    }
+    
+    .article-actions a:hover {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .no-articles {
+        background-color: white;
+        padding: 30px;
+        text-align: center;
+        border-radius: 8px;
+        color: #7f8c8d;
+        font-style: italic;
+    }
+</style>
+
     <h1>Список статей</h1>
 
     {% if current_user.is_authenticated %}
-        <a href="/lab8/create" >Создать статью</a>
+        <a href="/lab8/create" class="create-btn">Создать статью</a>
     {% endif %}
 
-    <form method="GET" action="/lab8/articles/">
-        <input type="text" name="search" value="{{ search }}" placeholder="Поиск">
+    <form method="GET" action="/lab8/articles/" class="search-form">
+        <input type="text" name="search" value="{{ search }}" placeholder="Поиск по статьям...">
         <button type="submit">Искать</button>
         {% if search %}
-        <a href="/lab8/articles/">Сбросить поиск</a>
+        <a href="/lab8/articles/" class="reset-link">Сбросить поиск</a>
         {% endif %}
     </form>
 
@@ -21,15 +167,19 @@
         {% if results %}
         <h2>Результаты поиска "{{ search }}":</h2>
         {% for article in results %}
-        <div>
+        <div class="article-card">
             <h3>{{ article.title }}</h3>
-            <div>
-                {% if current_user.is_authenticated and article.login_id == current_user.id and article.is_favorite %}★В избранном {% endif %}
-                {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
+            <div class="article-meta">
+                <div class="favorite-badge">
+                    {% if current_user.is_authenticated and article.login_id == current_user.id and article.is_favorite %}★ В избранном{% endif %}
+                </div>
+                <div class="{% if article.is_public %}public-badge{% else %}private-badge{% endif %}">
+                    {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
+                </div>
             </div>
-            <p>{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
+            <p class="article-text">{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
             {% if current_user.is_authenticated and article.login_id == current_user.id %}
-            <div>
+            <div class="article-actions">
                 <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
                 <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
             </div>
@@ -37,36 +187,44 @@
         </div>
         {% endfor %}
         {% else %}
-            <p>Ничего не найдено по запросу "{{ search }}"</p>
+            <div class="no-articles">
+                <p>Ничего не найдено по запросу "{{ search }}"</p>
+            </div>
         {% endif %}
 
     {% else %}
         {% if current_user.is_authenticated and my_articles %}
         <h2>Мои статьи</h2>
         {% for article in my_articles %}
-        <div>
+        <div class="article-card">
             <h3>{{ article.title }}</h3>
-            <div>
-                {% if article.is_favorite %}★ {% endif %}
-                {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
+            <div class="article-meta">
+                <div class="favorite-badge">
+                    {% if article.is_favorite %}★ В избранном{% endif %}
+                </div>
+                <div class="{% if article.is_public %}public-badge{% else %}private-badge{% endif %}">
+                    {% if article.is_public %}Публичная{% else %}Приватная{% endif %}
+                </div>
             </div>
-            <p>{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
-            <div>
+            <p class="article-text">{{ article.article_text[:200] }}{% if article.article_text|length > 200 %}...{% endif %}</p>
+            <div class="article-actions">
                 <a href="/lab8/edit/{{ article.id }}">Редактировать</a>
                 <a href="/lab8/delete/{{ article.id }}" onclick="return confirm('Удалить?')">Удалить</a>
             </div>
         </div>
         {% endfor %}
         {% elif current_user.is_authenticated and not my_articles %}
-        <p>У вас пока нет статей.</p>
+        <div class="no-articles">
+            <p>У вас пока нет статей. <a href="/lab8/create" class="create-btn">Создайте первую!</a></p>
+        </div>
         {% endif %}
 
         {% if public_articles %}
-        <h2>{% if current_user.is_authenticated %}Публичные статьи других{% else %}Публичные статьи{% endif %}</h2>
+        <h2>{% if current_user.is_authenticated %}Публичные статьи других пользователей{% else %}Публичные статьи{% endif %}</h2>
         {% for article in public_articles %}
-        <div>
+        <div class="article-card">
             <h3>{{ article.title }}</h3>
-            <p>{{ article.article_text[:300] }}{% if article.article_text|length > 300 %}...{% endif %}</p>
+            <p class="article-text">{{ article.article_text[:300] }}{% if article.article_text|length > 300 %}...{% endif %}</p>
         </div>
         {% endfor %}
         {% endif %}

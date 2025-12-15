@@ -1,39 +1,154 @@
 {% extends 'base.html' %}
+
 {% block lab %}Лабораторная работа 8{% endblock %}
 
 {% block main %}
+<style>
+    h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-top: 0;
+    }
+    
+    form {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 700px;
+        margin: 20px auto;
+    }
+    
+    form div {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #34495e;
+    }
+    
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    
+    textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+        min-height: 250px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        resize: vertical;
+    }
+    
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 25px 0;
+    }
+    
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .checkbox-item label {
+        font-weight: normal;
+        margin: 0;
+        cursor: pointer;
+    }
+    
+    button {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+        margin-right: 15px;
+    }
+    
+    button:hover {
+        background-color: #27ae60;
+    }
+    
+    .error {
+        color: #e74c3c;
+        background-color: #fdf2f2;
+        padding: 12px;
+        border-radius: 4px;
+        border-left: 3px solid #e74c3c;
+        margin: 15px 0;
+        font-size: 14px;
+    }
+    
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+</style>
+
     <h1>Создание статьи</h1>
     <form method="post">
         <div>
             <label>
                 Название статьи:
-                <input type="text" maxlength="50" name="title">
+                <input type="text" maxlength="50" name="title" placeholder="Введите название статьи (до 50 символов)">
             </label>
         </div>
         <div>
-            <textarea name="article_text"></textarea>
-        </div>
-
-        <div>
             <label>
-                <input type="checkbox" name="is_public">
-                Сделать статью публичной
+                Текст статьи:
+                <textarea name="article_text" placeholder="Начните писать свою статью здесь..."></textarea>
             </label>
         </div>
 
-        <div>
-            <label>
-                <input type="checkbox" name="is_favorite">
-                Сделать статью избранной
-            </label>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" name="is_public" id="is_public">
+                <label for="is_public">Сделать статью публичной</label>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" name="is_favorite" id="is_favorite">
+                <label for="is_favorite">Добавить статью в избранное</label>
+            </div>
         </div>
-        <div>
-            <button type="submit">Готово</button>
+        
+        <div class="actions">
+            <button type="submit">Создать статью</button>
+            <a href="/lab8/">На главную</a>
         </div>
-        <a href="/lab8/">На главную</a>
+        
         {% if error %}
-            <p style="color:red">{{ error }}</p>
+            <div class="error">
+                {{ error }}
+            </div>
         {% endif %}
-
     </form>
 {% endblock %}

@@ -3,26 +3,106 @@
 {% block lab %}Лабораторная работа 8{% endblock %}
 
 {% block main %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+    }
+    
+    h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-top: 0;
+    }
+    
+    form {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 400px;
+        margin: 20px auto;
+    }
+    
+    form div {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #34495e;
+    }
+    
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    
+    button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+    
+    button:hover {
+        background-color: #2980b9;
+    }
+    
+    .error {
+        color: #e74c3c;
+        background-color: #fdf2f2;
+        padding: 12px;
+        border-radius: 4px;
+        border-left: 3px solid #e74c3c;
+        margin: 15px 0;
+        font-size: 14px;
+    }
+</style>
+
     <h1>Регистрация</h1>
 
     <form action="/lab8/register" method="post">
         <div>
             <label>
-                Логин:<input type="text" name="login">
+                Логин:
+                <input type="text" name="login" placeholder="Придумайте логин">
             </label>
         </div>
 
         <div>
             <label>
-                Пароль: <input type="password", name="password">
+                Пароль:
+                <input type="password" name="password" placeholder="Придумайте пароль">
             </label>
         </div>
 
         <button type="submit">Зарегистрироваться</button>
         {% if error %}
-            <div style="color: red; margin-top: 10px;">
+            <div class="error">
                 {{ error }}
             </div>
         {% endif %}
+        
+        <div>
+            Уже есть аккаунт? <a href="/lab8/login">Войти</a>
+        </div>
     </form>
 {% endblock %}
