@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, redirect, request, abort
+from flask import Blueprint, render_template, redirect, request, session
 from db import db
 from db.models import users, articles
+from flask_login import login_user, login_required, current_user
 from os import path
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -38,14 +39,33 @@ def register():
     return redirect('/lab8/')
 
 
-@lab8.route('/lab8/login')
+@lab8.route('/lab8/login', methods=['GET', 'POST'])
 def login():
-    return render_template('lab8/login.html')
+    if request.method == 'GET':
+        return render_template('lab8/login.html')
+    
+    login_form = request.form.get('login')
+    password_form = request.form.get('password')
+    
+    if not login_form or not login_form.strip():
+        return render_template('lab8/login.html', error='Введите логин')
+    
+    if not password_form or not password_form.strip():
+        return render_template('lab8/login.html', error='Введите пароль')
+    
+    user = users.query.filter_by(login = login_form).first()
+    if user:
+        if check_password_hash(user.password, password_form):
+            login_user(user, remember = False)
+            return redirect('/lab8/')
+
+    return render_template('lab8/login.html', error='Ошибка входа: логин и/или пароль неверны')
 
 
 @lab8.route('/lab8/articles')
-def articles():
-    return render_template('lab8/articles.html')
+@login_required
+def article_list():
+    return 'список статей'
 
 
 @lab8.route('/lab8/create')
