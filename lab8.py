@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, request, session
 from db import db
 from db.models import users, articles
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 from os import path
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -60,6 +60,13 @@ def login():
             return redirect('/lab8/')
 
     return render_template('lab8/login.html', error='Ошибка входа: логин и/или пароль неверны')
+
+
+@lab8.route('/lab8/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/lab8/')
 
 
 @lab8.route('/lab8/articles')
