@@ -20,38 +20,26 @@ boxes = {
     for i in range(1, BOX_COUNT + 1)
 }
 
-def intersects(a, b):
-    return not (
-        a['left'] + BOX_SIZE < b['left'] or
-        a['left'] > b['left'] + BOX_SIZE or
-        a['top'] + BOX_SIZE < b['top'] or
-        a['top'] > b['top'] + BOX_SIZE
-    )
-
-def generate_positions():
-    positions = {}
-    for i in range(1, BOX_COUNT + 1):
-        while True:
-            pos = {"top": random.randint(80, 600 - BOX_SIZE), "left": random.randint(90, 1200 - BOX_SIZE)}
-            if all(not intersects(pos, positions[j]) for j in positions):
-                positions[i] = pos
-                break
-    return positions
-
+# Фиксированные позиции для каждой коробки
+FIXED_POSITIONS = {
+    1: {"top": 100, "left": 100},
+    2: {"top": 100, "left": 350},
+    3: {"top": 100, "left": 600},
+    4: {"top": 100, "left": 850},
+    5: {"top": 100, "left": 1100},
+    6: {"top": 300, "left": 100},
+    7: {"top": 300, "left": 350},
+    8: {"top": 300, "left": 600},
+    9: {"top": 300, "left": 850},
+    10: {"top": 300, "left": 1100}
+}
 
 @lab9.route('/lab9')
 def lab9_page():
     session.setdefault('opened_count', 0)
 
-    if 'positions' not in session or not isinstance(session['positions'], dict):
-        positions = generate_positions()
-        session['positions'] = {str(k): v for k, v in positions.items()}
-    else:
-        try:
-            positions = {int(k): v for k, v in session['positions'].items()}
-        except Exception:
-            positions = generate_positions()
-            session['positions'] = {str(k): v for k, v in positions.items()}
+    # Всегда используем фиксированные позиции
+    positions = FIXED_POSITIONS.copy()
 
     unopened_count = sum(not b['opened'] for b in boxes.values())
     return render_template(
@@ -90,5 +78,4 @@ def reset():
     for box in boxes.values():
         box['opened'] = False
     session['opened_count'] = 0
-    session.pop('positions', None)
     return jsonify({"ok": True})
