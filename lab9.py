@@ -6,8 +6,10 @@ lab9 = Blueprint('lab9', __name__)
 
 
 BOX_COUNT = 10
+BOX_SIZE = 120  # размер коробки в px
+VIP_BOXES = {1, 2, 3}  # VIP-подарки
 
-# состояние коробок (общие для всех)
+# состояние коробок
 boxes = {
     i: {
         "opened": False,
@@ -18,10 +20,6 @@ boxes = {
     for i in range(1, BOX_COUNT + 1)
 }
 
-# позиции (один раз)
-BOX_SIZE = 200
-positions = {}
-
 def intersects(a, b):
     return not (
         a['left'] + BOX_SIZE < b['left'] or
@@ -30,21 +28,31 @@ def intersects(a, b):
         a['top'] > b['top'] + BOX_SIZE
     )
 
-for i in range(1, BOX_COUNT + 1):
-    while True:
-        pos = {
-            "top": random.randint(60, 500),
-            "left": random.randint(100, 1000)
-        }
-
-        if all(not intersects(pos, positions[j]) for j in positions):
-            positions[i] = pos
-            break
+def generate_positions():
+    positions = {}
+    for i in range(1, BOX_COUNT + 1):
+        while True:
+            pos = {"top": random.randint(50, 500), "left": random.randint(50, 1200 - BOX_SIZE)}
+            if all(not intersects(pos, positions[j]) for j in positions):
+                positions[i] = pos
+                break
+    return positions
 
 
 @lab9.route('/lab9')
 def lab9_page():
     session.setdefault('opened_count', 0)
+
+    if 'positions' not in session or not isinstance(session['positions'], dict):
+        positions = generate_positions()
+        session['positions'] = {str(k): v for k, v in positions.items()}
+    else:
+        try:
+            positions = {int(k): v for k, v in session['positions'].items()}
+        except Exception:
+            positions = generate_positions()
+            session['positions'] = {str(k): v for k, v in positions.items()}
+
     unopened_count = sum(not b['opened'] for b in boxes.values())
     return render_template(
         'lab9/index.html',
@@ -53,13 +61,11 @@ def lab9_page():
         unopened_count=unopened_count
     )
 
-VIP_BOXES = {1, 2, 3}
 
 @lab9.route('/lab9/open', methods=['POST'])
 def open():
     box_id = int(request.json['box_id'])
 
-    # VIP-проверка
     if box_id in VIP_BOXES and not current_user.is_authenticated:
         return jsonify({"error": "Этот подарок доступен только авторизованным пользователям"})
 
@@ -84,4 +90,5 @@ def reset():
     for box in boxes.values():
         box['opened'] = False
     session['opened_count'] = 0
+    session.pop('positions', None)
     return jsonify({"ok": True})

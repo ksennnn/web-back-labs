@@ -8,32 +8,27 @@
 <h2> Новогодние подарки </h2>
 
 <p>Неоткрытых коробок: <span id="count">{{ unopened_count }}</span></p>
+
 <div class="user-status">
     {% if current_user.is_authenticated %}
-    Вы вошли как: <strong>{{ current_user.login }}</strong>
+        Вы вошли как: <strong>{{ current_user.login }}</strong>
     {% else %}
-    Вы не авторизованы
+        Вы не авторизованы
     {% endif %}
 </div>
 {% if not current_user.is_authenticated %}
-    <li>
-        <a class="menu-link" href="/lab8/login">Вход</a>
-    </li>
-    <li>
-        <a class="menu-link" href="/lab8/register">Регистрация</a>
-    </li>
+    <li><a class="menu-link" href="/lab8/login">Вход</a></li>
+    <li><a class="menu-link" href="/lab8/register">Регистрация</a></li>
 {% endif %}
 {% if current_user.is_authenticated %}
-    <li>
-        <a class="menu-link" href="/lab8/logout">Выход</a>
-    </li>
+    <li><a class="menu-link" href="/lab8/logout">Выход</a></li>
 {% endif %}
 
 {% if current_user.is_authenticated %}
 <button onclick="resetBoxes()"> Дед Мороз</button>
 {% endif %}
 
-<div style="position: relative; height: 100px;">
+<div style="position: relative; height: 400px;">
     {% for id, box in boxes.items() %}
         <img
             src="/static/{{ box.box }}"
@@ -41,8 +36,8 @@
             onclick="openBox({{ id }})"
             style="
                 position: absolute;
-                top: {{ positions[id].top }}px;
-                left: {{ positions[id].left }}px;
+                top: {{ positions[id]['top'] }}px;
+                left: {{ positions[id]['left'] }}px;
                 width: 200px;
                 cursor: pointer;
                 {% if box.opened %}opacity: 0.3;{% endif %}
@@ -67,11 +62,11 @@
         text-align:center;
         position:relative;
     ">
-<span onclick="closeModal()" style="
-    position:absolute;
-    top:5px; right:10px;
-    cursor:pointer;
-">✖</span>
+        <span onclick="closeModal()" style="
+            position:absolute;
+            top:5px; right:10px;
+            cursor:pointer;
+        ">✖</span>
 
         <div id="modal-content"></div>
     </div>
@@ -86,10 +81,7 @@ function openBox(id) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.error) {
-            alert(data.error);
-            return;
-        }
+        if (data.error) { alert(data.error); return; }
 
         document.getElementById('box' + id).style.opacity = '0.3';
 
