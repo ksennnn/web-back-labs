@@ -230,115 +230,85 @@ def view_recipe(recipe_id):
 @rgz.route('/rgz/search', methods=['GET', 'POST'])
 def search():
     """Поиск рецептов"""
+    conn, cur = db_connect()
+    
     if request.method == 'GET':
+        # Показываем форму поиска
+        db_close(conn, cur)
         return render_template('rgz/search.html',
                              login1=session.get('login1'))
     
+    # POST запрос - обработка поиска
     search_query = request.form.get('query', '').strip()
     ingredients = request.form.get('ingredients', '').strip()
-    search_mode = request.form.get('mode', 'any')  # 'any' или 'all'
+    search_mode = request.form.get('mode', 'any')
     
-    conn, cur = db_connect()
+    # Инициализируем переменные
+    recipes = []
+    query = ""
+    params = []
     
-    # Поиск по названию
+    # Определяем тип БД
+    is_postgres = current_app.config['DB_TYPE'] == 'postgres'
+    
     if search_query:
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("""
-                SELECT * FROM recipes 
-                WHERE title ILIKE %s 
-                ORDER BY id DESC;
-            """, (f'%{search_query}%',))
+        # Поиск по названию
+        if is_postgres:
+            query = "SELECT * FROM recipes WHERE title ILIKE %s ORDER BY id DESC;"
+            params = [f'%{search_query}%']
         else:
-            # Для SQLite: используем LOWER для регистронезависимости
-            search_query_lower = search_query.lower()
-            cur.execute("""
-                SELECT * FROM recipes 
-                WHERE LOWER(title) LIKE ? 
-                ORDER BY id DESC;
-            """, (f'%{search_query_lower}%',))
-    
-    # Поиск по ингредиентам
+            query = "SELECT * FROM recipes WHERE LOWER(title) LIKE ? ORDER BY id DESC;"
+            params = [f'%{search_query.lower()}%']
+            
     elif ingredients:
+        # Поиск по ингредиентам
         ingredient_list = [ing.strip() for ing in ingredients.split(',') if ing.strip()]
         
         if not ingredient_list:
             # Если ингредиенты пустые, показываем все
-            if current_app.config['DB_TYPE'] == 'postgres':
-                cur.execute("SELECT * FROM recipes ORDER BY id DESC LIMIT 20;")
-            else:
-                cur.execute("SELECT * FROM recipes ORDER BY id DESC LIMIT 20;")
-            
-            recipes = cur.fetchall()
-            db_close(conn, cur)
-            
-            return render_template('rgz/search_results.html',
-                                 recipes=recipes,
-                                 search_query=search_query,
-                                 ingredients=ingredients,
-                                 search_mode=search_mode,
-                                 login1=session.get('login1'))
-        
-        if search_mode == 'all':
+            query = "SELECT * FROM recipes ORDER BY id DESC LIMIT 20;"
+        elif search_mode == 'all':
             # Все ингредиенты должны быть в рецепте
-            if current_app.config['DB_TYPE'] == 'postgres':
-                query = """
-                    SELECT * FROM recipes 
-                    WHERE """
-                for i in range(len(ingredient_list)):
-                    query += f"ingredients ILIKE %s AND "
-                query = query[:-5] + " ORDER BY id DESC;"
-                
+            query_parts = []
+            for ing in ingredient_list:
+                if is_postgres:
+                    query_parts.append("ingredients ILIKE %s")
+                else:
+                    query_parts.append("LOWER(ingredients) LIKE ?")
+            
+            query = f"SELECT * FROM recipes WHERE {' AND '.join(query_parts)} ORDER BY id DESC;"
+            
+            # Подготавливаем параметры
+            if is_postgres:
                 params = [f'%{ing}%' for ing in ingredient_list]
-                cur.execute(query, params)
             else:
-                # Для SQLite: используем LOWER для регистронезависимости
-                query = """
-                    SELECT * FROM recipes 
-                    WHERE """
-                for i in range(len(ingredient_list)):
-                    query += f"LOWER(ingredients) LIKE ? AND "
-                query = query[:-5] + " ORDER BY id DESC;"
-                
-                # Приводим ингредиенты к нижнему регистру
                 params = [f'%{ing.lower()}%' for ing in ingredient_list]
-                cur.execute(query, params)
         else:
             # Хотя бы один ингредиент
-            if current_app.config['DB_TYPE'] == 'postgres':
-                query = """
-                    SELECT * FROM recipes 
-                    WHERE """
-                for i in range(len(ingredient_list)):
-                    if i > 0:
-                        query += " OR "
-                    query += f"ingredients ILIKE %s"
-                query += " ORDER BY id DESC;"
-                
+            query_parts = []
+            for ing in ingredient_list:
+                if is_postgres:
+                    query_parts.append("ingredients ILIKE %s")
+                else:
+                    query_parts.append("LOWER(ingredients) LIKE ?")
+            
+            query = f"SELECT * FROM recipes WHERE {' OR '.join(query_parts)} ORDER BY id DESC;"
+            
+            # Подготавливаем параметры
+            if is_postgres:
                 params = [f'%{ing}%' for ing in ingredient_list]
-                cur.execute(query, params)
             else:
-                # Для SQLite: используем LOWER для регистронезависимости
-                query = """
-                    SELECT * FROM recipes 
-                    WHERE """
-                for i in range(len(ingredient_list)):
-                    if i > 0:
-                        query += " OR "
-                    query += f"LOWER(ingredients) LIKE ?"
-                query += " ORDER BY id DESC;"
-                
-                # Приводим ингредиенты к нижнему регистру
                 params = [f'%{ing.lower()}%' for ing in ingredient_list]
-                cur.execute(query, params)
     
     else:
         # Если ничего не введено, показываем все
-        if current_app.config['DB_TYPE'] == 'postgres':
-            cur.execute("SELECT * FROM recipes ORDER BY id DESC LIMIT 20;")
-        else:
-            cur.execute("SELECT * FROM recipes ORDER BY id DESC LIMIT 20;")
+        query = "SELECT * FROM recipes ORDER BY id DESC LIMIT 20;"
     
-    recipes = cur.fetchall()
+    # Выполняем запрос
+    if query:
+        cur.execute(query, params)
+        recipes = cur.fetchall()
+    
     db_close(conn, cur)
     
     return render_template('rgz/search_results.html',
