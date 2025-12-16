@@ -1,7 +1,7 @@
 {% extends "rgz/base.html" %}
 
 {% block content %}
-<h2>Все рецепты ({{ recipes|length }})</h2>
+<h2>Все рецепты ({{ recipes|length }})</h2><br>
 
 {% if session.get('login1') %}
 <div class="add-recipe-link">

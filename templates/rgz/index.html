@@ -25,7 +25,7 @@
         <div class="no-photo">Нет фото</div>
         {% endif %}
         <h4><a href="{{ url_for('rgz.view_recipe', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h4>
-        <p class="ingredients-preview">{{ recipe.ingredients[:100] }}...</p>
+        <p class="ingredients-preview"><b>Ингридиенты:</b> {{ recipe.ingredients[:100] }}...</p>
         {% if session.get('login1') %}
         <div class="admin-actions">
             <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
