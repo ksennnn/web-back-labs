@@ -293,6 +293,8 @@ footer {
     border-radius: 4px;
     margin-right: 10px;
     margin-bottom: 10px;
+    margin-left: 10px;
+
 }
 
 .btn-delete {
@@ -426,7 +428,7 @@ footer {
 }
 
 .back-link a {
-    color: #512024;
+    color: #0743bb;
     text-decoration: none;
 }
 

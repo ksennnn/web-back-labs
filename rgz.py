@@ -246,22 +246,37 @@ def search():
             cur.execute("""
                 SELECT * FROM recipes 
                 WHERE title ILIKE %s 
-                OR title ILIKE %s 
                 ORDER BY id DESC;
-            """, (f'%{search_query}%', f'{search_query}%'))
+            """, (f'%{search_query}%',))
         else:
             # Для SQLite: используем LOWER для регистронезависимости
             search_query_lower = search_query.lower()
             cur.execute("""
                 SELECT * FROM recipes 
                 WHERE LOWER(title) LIKE ? 
-                OR LOWER(title) LIKE ? 
                 ORDER BY id DESC;
-            """, (f'%{search_query_lower}%', f'{search_query_lower}%'))
+            """, (f'%{search_query_lower}%',))
     
     # Поиск по ингредиентам
     elif ingredients:
-        ingredient_list = [ing.strip() for ing in ingredients.split(',')]
+        ingredient_list = [ing.strip() for ing in ingredients.split(',') if ing.strip()]
+        
+        if not ingredient_list:
+            # Если ингредиенты пустые, показываем все
+            if current_app.config['DB_TYPE'] == 'postgres':
+                cur.execute("SELECT * FROM recipes ORDER BY id DESC LIMIT 20;")
+            else:
+                cur.execute("SELECT * FROM recipes ORDER BY id DESC LIMIT 20;")
+            
+            recipes = cur.fetchall()
+            db_close(conn, cur)
+            
+            return render_template('rgz/search_results.html',
+                                 recipes=recipes,
+                                 search_query=search_query,
+                                 ingredients=ingredients,
+                                 search_mode=search_mode,
+                                 login1=session.get('login1'))
         
         if search_mode == 'all':
             # Все ингредиенты должны быть в рецепте
@@ -271,7 +286,7 @@ def search():
                     WHERE """
                 for i in range(len(ingredient_list)):
                     query += f"ingredients ILIKE %s AND "
-                query = query[:-4] + " ORDER BY id DESC;"
+                query = query[:-5] + " ORDER BY id DESC;"
                 
                 params = [f'%{ing}%' for ing in ingredient_list]
                 cur.execute(query, params)
@@ -282,7 +297,7 @@ def search():
                     WHERE """
                 for i in range(len(ingredient_list)):
                     query += f"LOWER(ingredients) LIKE ? AND "
-                query = query[:-4] + " ORDER BY id DESC;"
+                query = query[:-5] + " ORDER BY id DESC;"
                 
                 # Приводим ингредиенты к нижнему регистру
                 params = [f'%{ing.lower()}%' for ing in ingredient_list]
