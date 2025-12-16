@@ -250,16 +250,18 @@ def search():
                 ORDER BY id DESC;
             """, (f'%{search_query}%', f'{search_query}%'))
         else:
+            # Для SQLite: используем LOWER для регистронезависимости
+            search_query_lower = search_query.lower()
             cur.execute("""
                 SELECT * FROM recipes 
-                WHERE title LIKE ? 
-                OR title LIKE ? 
+                WHERE LOWER(title) LIKE ? 
+                OR LOWER(title) LIKE ? 
                 ORDER BY id DESC;
-            """, (f'%{search_query}%', f'{search_query}%'))
+            """, (f'%{search_query_lower}%', f'{search_query_lower}%'))
     
     # Поиск по ингредиентам
     elif ingredients:
-        ingredient_list = [ing.strip().lower() for ing in ingredients.split(',')]
+        ingredient_list = [ing.strip() for ing in ingredients.split(',')]
         
         if search_mode == 'all':
             # Все ингредиенты должны быть в рецепте
@@ -268,12 +270,13 @@ def search():
                     SELECT * FROM recipes 
                     WHERE """
                 for i in range(len(ingredient_list)):
-                    query += f"LOWER(ingredients) LIKE %s AND "
+                    query += f"ingredients ILIKE %s AND "
                 query = query[:-4] + " ORDER BY id DESC;"
                 
                 params = [f'%{ing}%' for ing in ingredient_list]
                 cur.execute(query, params)
             else:
+                # Для SQLite: используем LOWER для регистронезависимости
                 query = """
                     SELECT * FROM recipes 
                     WHERE """
@@ -281,7 +284,8 @@ def search():
                     query += f"LOWER(ingredients) LIKE ? AND "
                 query = query[:-4] + " ORDER BY id DESC;"
                 
-                params = [f'%{ing}%' for ing in ingredient_list]
+                # Приводим ингредиенты к нижнему регистру
+                params = [f'%{ing.lower()}%' for ing in ingredient_list]
                 cur.execute(query, params)
         else:
             # Хотя бы один ингредиент
@@ -292,12 +296,13 @@ def search():
                 for i in range(len(ingredient_list)):
                     if i > 0:
                         query += " OR "
-                    query += f"LOWER(ingredients) LIKE %s"
+                    query += f"ingredients ILIKE %s"
                 query += " ORDER BY id DESC;"
                 
                 params = [f'%{ing}%' for ing in ingredient_list]
                 cur.execute(query, params)
             else:
+                # Для SQLite: используем LOWER для регистронезависимости
                 query = """
                     SELECT * FROM recipes 
                     WHERE """
@@ -307,7 +312,8 @@ def search():
                     query += f"LOWER(ingredients) LIKE ?"
                 query += " ORDER BY id DESC;"
                 
-                params = [f'%{ing}%' for ing in ingredient_list]
+                # Приводим ингредиенты к нижнему регистру
+                params = [f'%{ing.lower()}%' for ing in ingredient_list]
                 cur.execute(query, params)
     
     else:
@@ -431,9 +437,7 @@ def edit_recipe(recipe_id):
 def delete_recipe(recipe_id):
     if not session.get('login1'):
         return redirect('/rgz/login')
-    
-    conn, cur = db_connect()
-    
+        
     conn, cur = db_connect()
     
     if current_app.config['DB_TYPE'] == 'postgres':
