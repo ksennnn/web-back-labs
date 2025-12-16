@@ -85,50 +85,6 @@ def all_recipes():
                          recipes=recipes, 
                          login1=session.get('login1'))
 
-@rgz.route('/rgz/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'GET':
-        return render_template('rgz/register.html')
-    
-    login1 = request.form.get('login1', '').strip()
-    password = request.form.get('password', '').strip()
-    full_name = request.form.get('full_name', '').strip()
-    
-    # Валидация
-    if not validate_login1(login1):
-        return render_template('rgz/register.html', 
-                             error='Логин должен содержать только латинские буквы, цифры и знаки ._- (от 3 до 50 символов)')
-    
-    if not validate_password(password):
-        return render_template('rgz/register.html', 
-                             error='Пароль должен содержать только латинские буквы, цифры и спецсимволы (минимум 6 символов)')
-    
-    conn, cur = db_connect()
-    
-    # Проверка существования пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("SELECT id FROM polzovat WHERE login1 = %s;", (login1,))
-    else:
-        cur.execute("SELECT id FROM polzovat WHERE login1 = ?;", (login1,))
-    
-    if cur.fetchone():
-        db_close(conn, cur)
-        return render_template('rgz/register.html', 
-                             error='Пользователь с таким логином уже существует')
-    
-    # Хеширование пароля
-    password_hash = generate_password_hash(password)
-    
-    # Создание пользователя
-    if current_app.config['DB_TYPE'] == 'postgres':
-        cur.execute("INSERT INTO polzovat (login1, password, full_name) VALUES (%s, %s, %s);", 
-                   (login1, password_hash, full_name))
-    else:
-        cur.execute("INSERT INTO polzovat (login1, password, full_name) VALUES (?, ?, ?);", 
-                   (login1, password_hash, full_name))
-    
-    db_close(conn, cur)
-    return redirect('/rgz/login')
 
 @rgz.route('/rgz/login', methods=['GET', 'POST'])
 def login():
@@ -139,11 +95,11 @@ def login():
     password = request.form.get('password', '').strip()
     
     if not validate_login1(login1):
-        return render_template('rgz/register.html', 
+        return render_template('rgz/login.html', 
                              error='Логин должен содержать только латинские буквы, цифры и знаки ._- (от 3 до 50 символов)')
     
     if not validate_password(password):
-        return render_template('rgz/register.html', 
+        return render_template('rgz/login.html', 
                              error='Пароль должен содержать только латинские буквы, цифры и спецсимволы (минимум 6 символов)')
 
     if not login1 or not password:

@@ -11,7 +11,7 @@
     <form method="post" class="auth-form">
         <div class="form-group">
             <label for="login1">Логин</label>
-            <input type="text" id="login1" name="login1" required
+            <input type="text" id="login1" name="login1"
                     pattern="[a-zA-Z0-9._-]{3,50}" 
                     title="Только латинские буквы, цифры и символы ._- (3-50 символов)">
             <small>Латинские буквы, цифры, ._- (3-50 символов)</small>
@@ -19,7 +19,7 @@
         
         <div class="form-group">
             <label for="password">Пароль</label>
-            <input type="password" id="password" name="password" required
+            <input type="password" id="password" name="password"
                     minlength="6"
                     pattern="[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]+"
                     title="Латинские буквы, цифры и спецсимволы (минимум 6 символов)">
@@ -28,9 +28,5 @@
         
         <button type="submit" class="btn-submit">Войти</button>
     </form>
-    
-    <div class="auth-links">
-        <p>Нет аккаунта? <a href="{{ url_for('rgz.register') }}">Зарегистрироваться</a></p>
-    </div>
 </div>
 {% endblock %}
