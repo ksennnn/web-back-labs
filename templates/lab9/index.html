@@ -5,186 +5,9 @@
 {% block script %}{% endblock %}
 
 {% block main %}
-<style>
-    body {
-        background: linear-gradient(to bottom, #0c2c4d, #1a3a5f);
-        color: #fff;
-        font-family: 'Arial', sans-serif;
-        margin: 0;
-        padding: 20px;
-    }
-
-    h2 {
-        color: #ffd700;
-        text-align: center;
-        font-size: 2em;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    p {
-        text-align: center;
-        font-size: 1.1em;
-        color: #e0f7ff;
-    }
-
-    #count {
-        color: #ff6b6b;
-        font-weight: bold;
-        font-size: 1.2em;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 5px 10px;
-        border-radius: 10px;
-    }
-
-    .user-status {
-        background: rgba(255, 255, 255, 0.1);
-        padding: 15px;
-        border-radius: 10px;
-        margin: 20px auto;
-        max-width: 400px;
-        text-align: center;
-        border: 1px solid rgba(255, 215, 0, 0.3);
-    }
-
-    .user-status strong {
-        color: #ffd700;
-    }
-
-    ul {
-        list-style: none;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin: 20px 0;
-    }
-
-    .menu-link {
-        background: linear-gradient(to right, #ff416c, #ff4b2b);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 20px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background 0.3s;
-    }
-
-    .menu-link:hover {
-        background: linear-gradient(to right, #ff4b2b, #ff416c);
-    }
-
-    button {
-        display: block;
-        margin: 30px auto;
-        padding: 12px 30px;
-        background: linear-gradient(to right, #00b09b, #96c93d);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-size: 1.1em;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: linear-gradient(to right, #96c93d, #00b09b);
-    }
-
-    .gift-container {
-        position: relative;
-        height: 400px;
-        margin: 30px 0;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
-        border: 2px dashed rgba(255, 215, 0, 0.3);
-        overflow: hidden;
-    }
-
-    .gift-box {
-        position: absolute;
-        width: 180px;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .gift-box:hover {
-        transform: scale(1.05);
-    }
-
-    #modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
-    }
-
-    .modal-content-wrapper {
-        background: linear-gradient(135deg, #1a3a5f, #0c2c4d);
-        width: 600px;
-        margin: 100px auto;
-        padding: 20px;
-        border-radius: 15px;
-        border: 2px solid #ffd700;
-        position: relative;
-    }
-
-    .close-modal {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        color: #ffd700;
-        font-size: 1.5em;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .close-modal:hover {
-        color: #ff6b6b;
-    }
-
-    .modal-content {
-        text-align: center;
-    }
-
-    #result {
-        text-align: center;
-        margin: 20px;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-    }
-
-    /* Новогодние украшения */
-    .container-decoration {
-        position: relative;
-    }
-
-    .container-decoration::before,
-    .container-decoration::after {
-        content: "🎄";
-        position: absolute;
-        font-size: 2em;
-        top: 10px;
-    }
-
-    .container-decoration::before {
-        left: 20px;
-    }
-
-    .container-decoration::after {
-        right: 20px;
-    }
-</style>
-
-<h2>🎁 Новогодние подарки 🎁</h2>
+<h2> Новогодние подарки </h2>
 
 <p>Неоткрытых коробок: <span id="count">{{ unopened_count }}</span></p>
-
 <div class="user-status">
     {% if current_user.is_authenticated %}
     Вы вошли как: <strong>{{ current_user.login }}</strong>
@@ -192,8 +15,6 @@
     Вы не авторизованы
     {% endif %}
 </div>
-
-<ul>
 {% if not current_user.is_authenticated %}
     <li>
         <a class="menu-link" href="/lab8/login">Вход</a>
@@ -207,33 +28,51 @@
         <a class="menu-link" href="/lab8/logout">Выход</a>
     </li>
 {% endif %}
-</ul>
 
 {% if current_user.is_authenticated %}
-<button onclick="resetBoxes()">🎅 Дед Мороз</button>
+<button onclick="resetBoxes()"> Дед Мороз</button>
 {% endif %}
 
-<div class="gift-container container-decoration">
+<div style="position: relative; height: 100px;">
     {% for id, box in boxes.items() %}
         <img
             src="/static/{{ box.box }}"
             id="box{{ id }}"
             onclick="openBox({{ id }})"
-            class="gift-box"
             style="
+                position: absolute;
                 top: {{ positions[id].top }}px;
                 left: {{ positions[id].left }}px;
-                {% if box.opened %}opacity: 0.3; filter: grayscale(0.7);{% endif %}
+                width: 200px;
+                cursor: pointer;
+                {% if box.opened %}opacity: 0.3;{% endif %}
             "
         >
     {% endfor %}
 </div>
 
 <div id="result"></div>
+<div id="modal" style="
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.6);
+">
+    <div style="
+        background:white;
+        width:600px;
+        margin:100px auto;
+        padding:20px;
+        text-align:center;
+        position:relative;
+    ">
+<span onclick="closeModal()" style="
+    position:absolute;
+    top:5px; right:10px;
+    cursor:pointer;
+">✖</span>
 
-<div id="modal">
-    <div class="modal-content-wrapper">
-        <span class="close-modal" onclick="closeModal()">✖</span>
         <div id="modal-content"></div>
     </div>
 </div>
@@ -252,14 +91,11 @@ function openBox(id) {
             return;
         }
 
-        const box = document.getElementById('box' + id);
-        box.style.opacity = '0.3';
-        box.style.filter = 'grayscale(0.7)';
+        document.getElementById('box' + id).style.opacity = '0.3';
 
         document.getElementById('modal-content').innerHTML =
-            `<h3 style="color: #ffd700;">🎄 Новогодний сюрприз! 🎄</h3>
-             <p style="font-size: 1.2em; color: #e0f7ff; margin: 20px 0;">${data.text}</p>
-             <img src="/static/${data.gift}" style="width: 100%; border-radius: 10px; max-height: 400px;">`;
+            `<p>${data.text}</p>
+             <img src="/static/${data.gift}" width="600">`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
@@ -271,8 +107,6 @@ function closeModal() {
 }
 
 function resetBoxes() {
-    if (!confirm('Дед Мороз принес новые подарки! Обновить подарки?')) return;
-    
     fetch('/lab9/reset', {method: 'POST'})
         .then(() => location.reload());
 }
