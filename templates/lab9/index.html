@@ -28,7 +28,13 @@
 <button onclick="resetBoxes()"> Дед Мороз</button>
 {% endif %}
 
-<div style="position: relative; height: 400px;">
+<!-- Основной контейнер для коробок -->
+<div id="boxes-container" style="
+    position: relative;
+    min-height: 400px;
+    overflow: hidden;  /* Обрезаем выходящие элементы */
+    margin-bottom: 50px;  /* Отступ перед футером */
+">
     {% for id, box in boxes.items() %}
         <img
             src="/static/{{ box.box }}"
@@ -39,8 +45,11 @@
                 top: {{ positions[id]['top'] }}px;
                 left: {{ positions[id]['left'] }}px;
                 width: 200px;
+                max-width: 100%;  /* Ограничиваем ширину */
+                height: auto;
                 cursor: pointer;
                 {% if box.opened %}opacity: 0.3;{% endif %}
+                z-index: 1;
             "
         >
     {% endfor %}
@@ -53,10 +62,12 @@
     top:0; left:0;
     width:100%; height:100%;
     background:rgba(0,0,0,0.6);
+    z-index: 1000;
 ">
     <div style="
         background:white;
         width:500px;
+        max-width: 90%;
         margin:60px auto;
         padding:20px;
         text-align:center;
@@ -66,14 +77,41 @@
             position:absolute;
             top:5px; right:10px;
             cursor:pointer;
+            font-size: 20px;
         ">✖</span>
 
         <div id="modal-content"></div>
     </div>
 </div>
+
 <style>
+    #boxes-container {
+        position: relative;
+        min-height: 400px;
+        max-height: 500px;
+        overflow: hidden;
+        margin-bottom: 50px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+    
+    #boxes-container img {
+        position: absolute;
+        transition: opacity 0.3s ease;
+        max-width: 200px;
+    }
+    
+    #modal-content img {
+        max-height: 300px;
+        width: auto;
+        margin-top: 15px;
+    }
+    
     footer {
-        margin-top: 100px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+        background: #f8f9fa;
     }
 </style>
 <script>
@@ -87,14 +125,21 @@ function openBox(id) {
     .then(data => {
         if (data.error) { alert(data.error); return; }
 
-        document.getElementById('box' + id).style.opacity = '0.3';
+        const boxElement = document.getElementById('box' + id);
+        boxElement.style.opacity = '0.3';
+        boxElement.style.pointerEvents = 'none';
 
         document.getElementById('modal-content').innerHTML =
-            `<p>${data.text}</p>
-            <img src="/static/${data.gift}" width="400">`;
+            `<h3>Вы открыли подарок!</h3>
+             <p>${data.text}</p>
+             <img src="/static/${data.gift}" alt="Подарок">`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка при открытии коробки');
     });
 }
 
@@ -103,8 +148,28 @@ function closeModal() {
 }
 
 function resetBoxes() {
+    if (!confirm('Вы уверены, что хотите сбросить все коробки? Это откроет все подарки заново.')) {
+        return;
+    }
+    
     fetch('/lab9/reset', {method: 'POST'})
-        .then(() => location.reload());
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Ошибка при сбросе коробок');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Произошла ошибка');
+        });
 }
+
+document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
 </script>
 {% endblock %}
