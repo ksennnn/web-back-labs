@@ -5,5 +5,394 @@
 {% block script %}{% endblock %}
 
 {% block main %}
-    <h1>Поздравления</h1>
+<style>
+    body {
+        background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+        color: #fff;
+        font-family: 'Arial', sans-serif;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(255, 20, 147, 0.1) 0%, transparent 20%),
+            radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.05) 0%, transparent 30%);
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    h2 {
+        color: #FFD700;
+        text-align: center;
+        font-size: 2.5em;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5),
+                     0 0 20px rgba(255, 215, 0, 0.3),
+                     0 0 30px rgba(255, 215, 0, 0.2);
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    h2::after {
+        content: '✨';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 1.5em;
+    }
+
+    p {
+        font-size: 1.2em;
+        text-align: center;
+        color: #E0E0FF;
+        margin: 20px 0;
+    }
+
+    #count {
+        display: inline-block;
+        background: rgba(255, 20, 147, 0.2);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        color: #FF69B4;
+        text-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+        border: 1px solid rgba(255, 105, 180, 0.3);
+    }
+
+    .user-status {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 15px;
+        margin: 20px auto;
+        max-width: 400px;
+        text-align: center;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .user-status strong {
+        color: #FFD700;
+        text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .menu-link {
+        display: inline-block;
+        background: linear-gradient(45deg, #FF416C, #FF4B2B);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        margin: 5px;
+        transition: all 0.3s ease;
+        border: none;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .menu-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+    }
+
+    button {
+        display: block;
+        margin: 30px auto;
+        padding: 15px 40px;
+        background: linear-gradient(45deg, #00b09b, #96c93d);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0, 176, 155, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 176, 155, 0.5);
+    }
+
+    button::before {
+        content: '🎅';
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2em;
+    }
+
+    .gift-container {
+        position: relative;
+        height: 500px;
+        margin: 40px 0;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 215, 0, 0.2);
+        overflow: hidden;
+    }
+
+    .gift-container::before {
+        content: '🎄 🎁 ❄️';
+        position: absolute;
+        top: 10px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 1.5em;
+        opacity: 0.5;
+        animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.8; }
+    }
+
+    .gift-box {
+        position: absolute;
+        width: 200px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+    }
+
+    .gift-box:hover {
+        transform: scale(1.1) rotate(5deg);
+        filter: drop-shadow(0 8px 20px rgba(255, 215, 0, 0.3));
+    }
+
+    #modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+    }
+
+    .modal-content-wrapper {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        width: 700px;
+        margin: 100px auto;
+        padding: 30px;
+        border-radius: 20px;
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modal-content-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+            transparent,
+            rgba(255, 215, 0, 0.1),
+            transparent 30%
+        );
+        animation: rotate 4s linear infinite;
+    }
+
+    @keyframes rotate {
+        100% { transform: rotate(360deg); }
+    }
+
+    .modal-content {
+        position: relative;
+        z-index: 1;
+        background: rgba(26, 26, 46, 0.9);
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        color: #FFD700;
+        font-size: 2em;
+        cursor: pointer;
+        z-index: 2;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .close-modal:hover {
+        transform: scale(1.2);
+        color: #FF69B4;
+    }
+
+    #result {
+        text-align: center;
+        margin: 20px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .snowflake {
+        position: absolute;
+        color: white;
+        font-size: 1.5em;
+        user-select: none;
+        pointer-events: none;
+        opacity: 0.7;
+        animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+        to { transform: translateY(100vh); }
+    }
+</style>
+
+<h2>Новогодние подарки</h2>
+
+<p>Неоткрытых коробок: <span id="count">{{ unopened_count }}</span></p>
+<div class="user-status">
+    {% if current_user.is_authenticated %}
+    Вы вошли как: <strong>{{ current_user.login }}</strong>
+    {% else %}
+    Вы не авторизованы
+    {% endif %}
+</div>
+
+<ul>
+{% if not current_user.is_authenticated %}
+    <li>
+        <a class="menu-link" href="/lab8/login">Вход</a>
+    </li>
+    <li>
+        <a class="menu-link" href="/lab8/register">Регистрация</a>
+    </li>
+{% endif %}
+{% if current_user.is_authenticated %}
+    <li>
+        <a class="menu-link" href="/lab8/logout">Выход</a>
+    </li>
+{% endif %}
+</ul>
+
+{% if current_user.is_authenticated %}
+<button onclick="resetBoxes()">Дед Мороз</button>
+{% endif %}
+
+<div class="gift-container">
+    {% for id, box in boxes.items() %}
+        <img
+            src="/static/{{ box.box }}"
+            id="box{{ id }}"
+            onclick="openBox({{ id }})"
+            class="gift-box"
+            style="
+                top: {{ positions[id].top }}px;
+                left: {{ positions[id].left }}px;
+                {% if box.opened %}opacity: 0.3;{% endif %}
+            "
+        >
+    {% endfor %}
+</div>
+
+<div id="result"></div>
+<div id="modal">
+    <div class="modal-content-wrapper">
+        <span class="close-modal" onclick="closeModal()">✖</span>
+        <div id="modal-content"></div>
+    </div>
+</div>
+
+<script>
+// Добавляем снежинки
+function createSnowflakes() {
+    const container = document.querySelector('.gift-container');
+    for (let i = 0; i < 30; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.innerHTML = '❄';
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        snowflake.style.animationDelay = Math.random() * 5 + 's';
+        snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+        snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+        container.appendChild(snowflake);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', createSnowflakes);
+
+function openBox(id) {
+    fetch('/lab9/open', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({box_id: id})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        const box = document.getElementById('box' + id);
+        box.style.opacity = '0.3';
+        box.style.transform = 'scale(0.9)';
+        box.style.filter = 'grayscale(0.8)';
+
+        document.getElementById('modal-content').innerHTML =
+            `<h3 style="color: #FFD700; margin-bottom: 20px;">С Новым Годом!</h3>
+             <p style="font-size: 1.2em; margin-bottom: 30px; color: #E0E0FF;">${data.text}</p>
+             <img src="/static/${data.gift}" style="width: 100%; border-radius: 10px; border: 2px solid rgba(255, 215, 0, 0.3);">`;
+
+        document.getElementById('modal').style.display = 'block';
+        document.getElementById('count').innerText = data.opened_left;
+    });
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function resetBoxes() {
+    if (!confirm('Дед Мороз принес новые подарки! Продолжить?')) return;
+    
+    fetch('/lab9/reset', {method: 'POST'})
+        .then(() => {
+            // Добавляем праздничный эффект перед перезагрузкой
+            document.body.style.background = 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)';
+            setTimeout(() => location.reload(), 500);
+        });
+}
+</script>
 {% endblock %}
