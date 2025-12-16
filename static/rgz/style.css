@@ -81,8 +81,9 @@ footer {
     color: white;
     text-align: center;
     position: fixed;
+    bottom: 0;
+    right: 0;
     left: 0;
-    top: 0;
 }
 
 /* Сетка рецептов */
@@ -131,7 +132,7 @@ footer {
 }
 
 .recipe-card h4 a:hover {
-    color: #410e0e;
+    color: #81126b;
 }
 
 .ingredients-preview {
@@ -272,11 +273,12 @@ footer {
 .btn-edit {
     display: inline-block;
     padding: 0.5rem 1rem;
-    background: #28a745;
+    background: #073505;
     color: white;
     text-decoration: none;
     border-radius: 4px;
-    margin-right: 0.5rem;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .btn-delete {
@@ -286,6 +288,7 @@ footer {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    margin-bottom: 10px;
 }
 
 /* Админские действия */
@@ -409,7 +412,7 @@ footer {
 }
 
 .back-link a {
-    color: #2575fc;
+    color: #512024;
     text-decoration: none;
 }
 
