@@ -149,6 +149,14 @@ def login():
     login1 = request.form.get('login1', '').strip()
     password = request.form.get('password', '').strip()
     
+    if not validate_login1(login1):
+        return render_template('rgz/register.html', 
+                             error='Логин должен содержать только латинские буквы, цифры и знаки ._- (от 3 до 50 символов)')
+    
+    if not validate_password(password):
+        return render_template('rgz/register.html', 
+                             error='Пароль должен содержать только латинские буквы, цифры и спецсимволы (минимум 6 символов)')
+
     if not login1 or not password:
         return render_template('rgz/login.html', 
                              error='Заполните все поля')
