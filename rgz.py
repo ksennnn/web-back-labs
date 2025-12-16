@@ -32,19 +32,16 @@ def db_close(conn, cur):
     conn.close()
 
 def validate_login1(login1):
-    """Валидация логина"""
     if not login1 or len(login1) < 3 or len(login1) > 50:
         return False
     return bool(re.match(r'^[a-zA-Z0-9._-]+$', login1))
 
 def validate_password(password):
-    """Валидация пароля"""
     if not password or len(password) < 6:
         return False
     return bool(re.match(r'^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]+$', password))
 
 def validate_recipe_data(title, ingredients, steps, photo_url):
-    """Валидация данных рецепта"""
     errors = []
     if not title or len(title) < 3 or len(title) > 100:
         errors.append("Название рецепта должно быть от 3 до 100 символов")
@@ -58,7 +55,6 @@ def validate_recipe_data(title, ingredients, steps, photo_url):
 
 @rgz.route('/rgz/')
 def index():
-    """Главная страница"""
     conn, cur = db_connect()
     
     if current_app.config['DB_TYPE'] == 'postgres':
@@ -75,7 +71,6 @@ def index():
 
 @rgz.route('/rgz/recipes')
 def all_recipes():
-    """Все рецепты"""
     conn, cur = db_connect()
     
     if current_app.config['DB_TYPE'] == 'postgres':
@@ -92,7 +87,6 @@ def all_recipes():
 
 @rgz.route('/rgz/register', methods=['GET', 'POST'])
 def register():
-    """Регистрация пользователя"""
     if request.method == 'GET':
         return render_template('rgz/register.html')
     
@@ -108,10 +102,6 @@ def register():
     if not validate_password(password):
         return render_template('rgz/register.html', 
                              error='Пароль должен содержать только латинские буквы, цифры и спецсимволы (минимум 6 символов)')
-    
-    if not full_name or len(full_name) < 2:
-        return render_template('rgz/register.html', 
-                             error='Укажите корректное ФИО')
     
     conn, cur = db_connect()
     
@@ -142,7 +132,6 @@ def register():
 
 @rgz.route('/rgz/login', methods=['GET', 'POST'])
 def login():
-    """Авторизация"""
     if request.method == 'GET':
         return render_template('rgz/login.html')
     
@@ -190,13 +179,11 @@ def login():
 
 @rgz.route('/rgz/logout')
 def logout():
-    """Выход из системы"""
     session.pop('login1', None)
     return redirect('/rgz/')
 
 @rgz.route('/rgz/delete_account', methods=['POST'])
 def delete_account():
-    """Удаление аккаунта"""
     login1 = session.get('login1')
     if not login1:
         return redirect('/rgz/login')
@@ -217,7 +204,6 @@ def delete_account():
 
 @rgz.route('/rgz/recipe/<int:recipe_id>')
 def view_recipe(recipe_id):
-    """Просмотр рецепта"""
     conn, cur = db_connect()
     
     if current_app.config['DB_TYPE'] == 'postgres':
@@ -237,18 +223,17 @@ def view_recipe(recipe_id):
 
 @rgz.route('/rgz/search', methods=['GET', 'POST'])
 def search():
-    """Поиск рецептов"""
     if request.method == 'GET':
         return render_template('rgz/search.html',
                              login1=session.get('login1'))
     
     search_query = request.form.get('query', '').strip()
     ingredients = request.form.get('ingredients', '').strip()
-    search_mode = request.form.get('mode', 'any')  # 'any' или 'all'
+    search_mode = request.form.get('mode', 'any')
     
     conn, cur = db_connect()
     
-    # Загружаем все рецепты для фильтрации на стороне Python
+    #Загружаем все рецепты для фильтрации на стороне Python
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("SELECT * FROM recipes ORDER BY id DESC;")
     else:
@@ -257,31 +242,31 @@ def search():
     all_recipes = cur.fetchall()
     db_close(conn, cur)
     
-    # Фильтрация на стороне Python
+    #Фильтрация на стороне Python
     filtered_recipes = []
     
     for recipe in all_recipes:
         matches = True
         
-        # Поиск по названию (регистронезависимый)
+        #Поиск по названию
         if search_query:
             recipe_title = recipe['title'].lower() if isinstance(recipe['title'], str) else ''
             search_lower = search_query.lower()
             if search_lower not in recipe_title:
                 matches = False
         
-        # Поиск по ингредиентам (регистронезависимый)
+        # Поиск по ингредиентам
         if ingredients and matches:
             ingredient_list = [ing.strip().lower() for ing in ingredients.split(',') if ing.strip()]
             recipe_ingredients = recipe['ingredients'].lower() if isinstance(recipe['ingredients'], str) else ''
             
             if search_mode == 'all':
-                # Все ингредиенты должны быть в рецепте
+                #Все ингредиенты должны быть в рецепте
                 for ingredient in ingredient_list:
                     if ingredient not in recipe_ingredients:
                         matches = False
                         break
-            else:  # 'any' - хотя бы один ингредиент
+            else:  #хотя бы один ингредиент
                 any_found = False
                 for ingredient in ingredient_list:
                     if ingredient in recipe_ingredients:
@@ -303,19 +288,19 @@ def search():
 @rgz.route('/rgz/add_recipe', methods=['GET', 'POST'])
 def add_recipe():
     if not session.get('login1'):
-        return redirect('/rgz/login')  # Перенаправляем на вход если не авторизован
+        return redirect('/rgz/login')
     
     if request.method == 'GET':
         return render_template('rgz/add_recipe.html',
                              login1=session.get('login1'))
     
-    # Получение данных из формы
+    #Получение данных из формы
     title = request.form.get('title', '').strip()
     ingredients = request.form.get('ingredients', '').strip()
     steps = request.form.get('steps', '').strip()
     photo_url = request.form.get('photo_url', '').strip()
     
-    # Валидация
+    #Валидация
     errors = validate_recipe_data(title, ingredients, steps, photo_url)
     if errors:
         return render_template('rgz/add_recipe.html',
@@ -328,7 +313,7 @@ def add_recipe():
     
     conn, cur = db_connect()
     
-    # Добавление рецепта
+    #Добавление рецепта
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("""
             INSERT INTO recipes (title, ingredients, steps, photo_url) 
@@ -347,7 +332,7 @@ def add_recipe():
 @rgz.route('/rgz/edit_recipe/<int:recipe_id>', methods=['GET', 'POST'])
 def edit_recipe(recipe_id):
     if not session.get('login1'):
-        return redirect('/rgz/login')  # Перенаправляем на вход если не авторизован
+        return redirect('/rgz/login')
     
     conn, cur = db_connect()
     
@@ -367,13 +352,12 @@ def edit_recipe(recipe_id):
                              recipe=recipe,
                              login1=session.get('login1'))
     
-    # POST запрос - обновление
     title = request.form.get('title', '').strip()
     ingredients = request.form.get('ingredients', '').strip()
     steps = request.form.get('steps', '').strip()
     photo_url = request.form.get('photo_url', '').strip()
     
-    # Валидация
+    #Валидация
     errors = validate_recipe_data(title, ingredients, steps, photo_url)
     if errors:
         return render_template('rgz/edit_recipe.html',
@@ -382,7 +366,7 @@ def edit_recipe(recipe_id):
                                     'steps': steps, 'photo_url': photo_url},
                              login1=session.get('login1'))
     
-    # Обновление рецепта
+    #Обновление рецепта
     if current_app.config['DB_TYPE'] == 'postgres':
         cur.execute("""
             UPDATE recipes 
