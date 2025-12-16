@@ -19,7 +19,7 @@ body {
 
 /* Шапка */
 header {
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    background: linear-gradient(135deg, #461e1e 0%, #684f4f 100%);
     color: white;
     padding: 1rem 0;
     margin-bottom: 2rem;
@@ -64,7 +64,7 @@ nav a:hover {
 }
 
 .logout-btn {
-    background-color: #ff6b6b;
+    background-color: #000000;
     color: white;
 }
 
@@ -80,6 +80,9 @@ footer {
     background-color: #333;
     color: white;
     text-align: center;
+    position: fixed;
+    left: 0;
+    top: 0;
 }
 
 /* Сетка рецептов */
@@ -128,7 +131,7 @@ footer {
 }
 
 .recipe-card h4 a:hover {
-    color: #2575fc;
+    color: #410e0e;
 }
 
 .ingredients-preview {
@@ -242,7 +245,7 @@ footer {
 
 /* Кнопки */
 .btn-submit, .btn-search, .btn-add {
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    background: linear-gradient(135deg, #2e0404 0%, #432c2c 100%);
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
