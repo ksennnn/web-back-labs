@@ -56,8 +56,8 @@
 ">
     <div style="
         background:white;
-        width:600px;
-        margin:100px auto;
+        width:500px;
+        margin:60px auto;
         padding:20px;
         text-align:center;
         position:relative;
@@ -87,7 +87,7 @@ function openBox(id) {
 
         document.getElementById('modal-content').innerHTML =
             `<p>${data.text}</p>
-             <img src="/static/${data.gift}" width="600">`;
+            <img src="/static/${data.gift}" width="400">`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
