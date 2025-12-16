@@ -71,8 +71,7 @@ def index():
     
     return render_template('rgz/index.html', 
                          recipes=recipes, 
-                         login1=session.get('login1'),
-                         is_admin=session.get('is_admin', False))
+                         login1=session.get('login1'))
 
 @rgz.route('/rgz/recipes')
 def all_recipes():
@@ -89,8 +88,7 @@ def all_recipes():
     
     return render_template('rgz/recipes.html', 
                          recipes=recipes, 
-                         login1=session.get('login1'),
-                         is_admin=session.get('is_admin', False))
+                         login1=session.get('login1'))
 
 @rgz.route('/rgz/register', methods=['GET', 'POST'])
 def register():
@@ -178,8 +176,6 @@ def login():
     
     # Сохраняем в сессии
     session['login1'] = login1
-    session['user_id'] = user['id']
-    session['is_admin'] = user.get('is_admin', False)
     
     db_close(conn, cur)
     return redirect('/rgz/')
@@ -188,8 +184,6 @@ def login():
 def logout():
     """Выход из системы"""
     session.pop('login1', None)
-    session.pop('user_id', None)
-    session.pop('is_admin', None)
     return redirect('/rgz/')
 
 @rgz.route('/rgz/delete_account', methods=['POST'])
@@ -210,8 +204,6 @@ def delete_account():
     
     # Очищаем сессию
     session.pop('login1', None)
-    session.pop('user_id', None)
-    session.pop('is_admin', None)
     
     return redirect('/rgz/')
 
@@ -233,16 +225,14 @@ def view_recipe(recipe_id):
     
     return render_template('rgz/recipe.html', 
                          recipe=recipe,
-                         login1=session.get('login1'),
-                         is_admin=session.get('is_admin', False))
+                         login1=session.get('login1'))
 
 @rgz.route('/rgz/search', methods=['GET', 'POST'])
 def search():
     """Поиск рецептов"""
     if request.method == 'GET':
         return render_template('rgz/search.html',
-                             login1=session.get('login1'),
-                             is_admin=session.get('is_admin', False))
+                             login1=session.get('login1'))
     
     search_query = request.form.get('query', '').strip()
     ingredients = request.form.get('ingredients', '').strip()
@@ -335,19 +325,16 @@ def search():
                          search_query=search_query,
                          ingredients=ingredients,
                          search_mode=search_mode,
-                         login1=session.get('login1'),
-                         is_admin=session.get('is_admin', False))
+                         login1=session.get('login1'))
 
 @rgz.route('/rgz/add_recipe', methods=['GET', 'POST'])
 def add_recipe():
-    """Добавление рецепта (только для администратора)"""
-    if not session.get('is_admin'):
-        return "Доступ запрещен", 403
+    if not session.get('login1'):
+        return redirect('/rgz/login')  # Перенаправляем на вход если не авторизован
     
     if request.method == 'GET':
         return render_template('rgz/add_recipe.html',
-                             login1=session.get('login1'),
-                             is_admin=session.get('is_admin', False))
+                             login1=session.get('login1'))
     
     # Получение данных из формы
     title = request.form.get('title', '').strip()
@@ -364,8 +351,7 @@ def add_recipe():
                              ingredients=ingredients,
                              steps=steps,
                              photo_url=photo_url,
-                             login1=session.get('login1'),
-                             is_admin=session.get('is_admin', False))
+                             login1=session.get('login1'))
     
     conn, cur = db_connect()
     
@@ -387,9 +373,8 @@ def add_recipe():
 
 @rgz.route('/rgz/edit_recipe/<int:recipe_id>', methods=['GET', 'POST'])
 def edit_recipe(recipe_id):
-    """Редактирование рецепта (только для администратора)"""
-    if not session.get('is_admin'):
-        return "Доступ запрещен", 403
+    if not session.get('login1'):
+        return redirect('/rgz/login')  # Перенаправляем на вход если не авторизован
     
     conn, cur = db_connect()
     
@@ -407,8 +392,7 @@ def edit_recipe(recipe_id):
         
         return render_template('rgz/edit_recipe.html',
                              recipe=recipe,
-                             login1=session.get('login1'),
-                             is_admin=session.get('is_admin', False))
+                             login1=session.get('login1'))
     
     # POST запрос - обновление
     title = request.form.get('title', '').strip()
@@ -423,8 +407,7 @@ def edit_recipe(recipe_id):
                              errors=errors,
                              recipe={'id': recipe_id, 'title': title, 'ingredients': ingredients, 
                                     'steps': steps, 'photo_url': photo_url},
-                             login1=session.get('login1'),
-                             is_admin=session.get('is_admin', False))
+                             login1=session.get('login1'))
     
     # Обновление рецепта
     if current_app.config['DB_TYPE'] == 'postgres':
@@ -446,9 +429,10 @@ def edit_recipe(recipe_id):
 
 @rgz.route('/rgz/delete_recipe/<int:recipe_id>', methods=['POST'])
 def delete_recipe(recipe_id):
-    """Удаление рецепта (только для администратора)"""
-    if not session.get('is_admin'):
-        return "Доступ запрещен", 403
+    if not session.get('login1'):
+        return redirect('/rgz/login')
+    
+    conn, cur = db_connect()
     
     conn, cur = db_connect()
     

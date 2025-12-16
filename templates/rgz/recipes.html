@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Все рецепты ({{ recipes|length }})</h2>
 
-{% if session.get('is_admin') %}
+{% if session.get('login1') %}
 <div class="add-recipe-link">
     <a href="{{ url_for('rgz.add_recipe') }}" class="btn-add">+ Добавить новый рецепт</a>
 </div>
@@ -14,7 +14,6 @@
     <div class="recipe-item">
         <div class="recipe-header">
             <h3><a href="{{ url_for('rgz.view_recipe', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h3>
-            <span class="recipe-date">{{ recipe.created_at.strftime('%d.%m.%Y') }}</span>
         </div>
         
         <div class="recipe-content">
@@ -28,14 +27,14 @@
                 <h4>Ингредиенты:</h4>
                 <p>{{ recipe.ingredients[:200] }}{% if recipe.ingredients|length > 200 %}...{% endif %}</p>
                 
-                {% if session.get('is_admin') %}
-                <div class="admin-actions">
-                    <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
-                    <form action="{{ url_for('rgz.delete_recipe', recipe_id=recipe.id) }}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-delete" onclick="return confirm('Удалить рецепт?')">Удалить</button>
-                    </form>
-                </div>
-                {% endif %}
+            {% if session.get('login1') %}
+            <div class="admin-actions">
+                <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
+                <form action="{{ url_for('rgz.delete_recipe', recipe_id=recipe.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Удалить рецепт?')">Удалить</button>
+                </form>
+            </div>
+            {% endif %}
             </div>
         </div>
     </div>

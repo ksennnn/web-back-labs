@@ -9,8 +9,8 @@
         <li>Просматривать все рецепты</li>
         <li>Искать рецепты по названию или ингредиентам</li>
         <li>Зарегистрироваться для получения дополнительных возможностей</li>
-        {% if session.get('is_admin') %}
-            <li>Добавлять, редактировать и удалять рецепты (администратор)</li>
+        {% if session.get('login1') %}
+            <li>Добавлять, редактировать и удалять рецепты</li>
         {% endif %}
     </ul>
 </div>
@@ -26,7 +26,7 @@
         {% endif %}
         <h4><a href="{{ url_for('rgz.view_recipe', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h4>
         <p class="ingredients-preview">{{ recipe.ingredients[:100] }}...</p>
-        {% if session.get('is_admin') %}
+        {% if session.get('login1') %}
         <div class="admin-actions">
             <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
             <form action="{{ url_for('rgz.delete_recipe', recipe_id=recipe.id) }}" method="post" style="display:inline;">

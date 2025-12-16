@@ -4,7 +4,7 @@
 <div class="recipe-full">
     <div class="recipe-header">
         <h2>{{ recipe.title }}</h2>
-        {% if session.get('is_admin') %}
+        {% if session.get('login1') %}
         <div class="admin-actions">
             <a href="{{ url_for('rgz.edit_recipe', recipe_id=recipe.id) }}" class="btn-edit">Редактировать</a>
             <form action="{{ url_for('rgz.delete_recipe', recipe_id=recipe.id) }}" method="post" style="display:inline;">
@@ -12,10 +12,6 @@
             </form>
         </div>
         {% endif %}
-    </div>
-    
-    <div class="recipe-meta">
-        <span>Добавлено: {{ recipe.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
     </div>
     
     {% if recipe.photo_url %}

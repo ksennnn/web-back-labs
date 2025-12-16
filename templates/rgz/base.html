@@ -16,9 +16,7 @@
                     <a href="{{ url_for('rgz.search') }}">Поиск</a>
                     
                     {% if session.get('login1') %}
-                        {% if session.get('is_admin') %}
-                            <a href="{{ url_for('rgz.add_recipe') }}">Добавить рецепт</a>
-                        {% endif %}
+                        <a href="{{ url_for('rgz.add_recipe') }}">Добавить рецепт</a>
                         <span class="user-info">
                             {{ session.get('login1') }}
                             <form action="{{ url_for('rgz.logout') }}" method="get" style="display:inline;">
