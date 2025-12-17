@@ -27,7 +27,7 @@
 <button onclick="resetBoxes()"> Дед Мороз</button>
 {% endif %}
 
-<div style="position: relative; height: 300px;">
+<div style="position: relative; height: 400px;">
     {% for id, box in boxes.items() %}
         <img
             src="/static/{{ box.box }}"
@@ -55,7 +55,7 @@
     ">
         <div style="
             background:white;
-            width:300px;
+            width:500px;
             margin:60px auto;
             padding:20px;
             text-align:center;
@@ -86,7 +86,7 @@ function openBox(id) {
 
         document.getElementById('modal-content').innerHTML =
             `<p>${data.text}</p>
-            <img src="/static/${data.gift}" width="200">`;
+            <img src="/static/${data.gift}" width="300">`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
