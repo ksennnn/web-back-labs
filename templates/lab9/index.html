@@ -17,8 +17,7 @@
     {% endif %}
 </div>
 {% if not current_user.is_authenticated %}
-    <li><a class="menu-link" href="/lab8/login">Вход</a></li>
-    <li><a class="menu-link" href="/lab8/register">Регистрация</a></li>
+    <li><a class="menu-link" href="/lab8/login">Войти</a></li>
 {% endif %}
 {% if current_user.is_authenticated %}
     <li><a class="menu-link" href="/lab8/logout">Выход</a></li>
@@ -28,7 +27,7 @@
 <button onclick="resetBoxes()"> Дед Мороз</button>
 {% endif %}
 
-<div style="position: relative; height: 400px;">
+<div style="position: relative; height: 300px;">
     {% for id, box in boxes.items() %}
         <img
             src="/static/{{ box.box }}"
@@ -56,7 +55,7 @@
     ">
         <div style="
             background:white;
-            width:500px;
+            width:300px;
             margin:60px auto;
             padding:20px;
             text-align:center;
@@ -87,7 +86,7 @@ function openBox(id) {
 
         document.getElementById('modal-content').innerHTML =
             `<p>${data.text}</p>
-            <img src="/static/${data.gift}" width="400">`;
+            <img src="/static/${data.gift}" width="200">`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
