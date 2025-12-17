@@ -8,6 +8,7 @@
 <h2> Новогодние подарки </h2>
 
 <p>Неоткрытых коробок: <span id="count">{{ unopened_count }}</span></p>
+<p>Вы открыли: <span id="user-opened-count">{{ user_opened_count }}</span>/3</p>
 
 <div class="user-status">
     {% if current_user.is_authenticated %}
@@ -94,6 +95,7 @@ function openBox(id) {
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
+        document.getElementById('user-opened-count').innerText = data.user_opened_count;
     })
     .catch(error => {
         console.error('Error:', error);
