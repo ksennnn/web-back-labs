@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, jsonify, request, g
+from flask import Blueprint, render_template, session, jsonify, request
 from flask_login import login_required, current_user
 import json
 
@@ -8,24 +8,21 @@ BOX_COUNT = 10
 BOX_SIZE = 120  # размер коробки в px
 VIP_BOXES = {1, 2, 3}  # VIP-подарки
 
-# Фиксированные позиции для каждой коробки
 FIXED_POSITIONS = {
-    1: {"top": 0, "left": 100},
-    2: {"top": 0, "left": 350},
-    3: {"top": 0, "left": 600},
-    4: {"top": 0, "left": 850},
-    5: {"top": 0, "left": 1100},
-    6: {"top": 200, "left": 100},
-    7: {"top": 200, "left": 350},
-    8: {"top": 200, "left": 600},
-    9: {"top": 200, "left": 850},
-    10: {"top": 200, "left": 1100}
+    '1': {"top": 0, "left": 100},
+    '2': {"top": 0, "left": 350},
+    '3': {"top": 0, "left": 600},
+    '4': {"top": 0, "left": 850},
+    '5': {"top": 0, "left": 1100},
+    '6': {"top": 200, "left": 100},
+    '7': {"top": 200, "left": 350},
+    '8': {"top": 200, "left": 600},
+    '9': {"top": 200, "left": 850},
+    '10': {"top": 200, "left": 1100}
 }
 
-# Инициализация состояния коробок для каждого пользователя
 def get_user_boxes():
     if 'boxes' not in session:
-        # Создаем начальное состояние для нового пользователя
         boxes = {}
         for i in range(1, BOX_COUNT + 1):
             boxes[str(i)] = {
@@ -43,7 +40,6 @@ def save_user_boxes(boxes):
 
 @lab9.route('/lab9')
 def lab9_page():
-    # Инициализация счетчика открытий для пользователя
     if 'opened_count' not in session:
         session['opened_count'] = 0
     
@@ -60,7 +56,7 @@ def lab9_page():
 
 @lab9.route('/lab9/open', methods=['POST'])
 def open_box():
-    box_id = str(request.json['box_id'])
+    box_id = request.json['box_id']
     boxes = get_user_boxes()
     
     if int(box_id) in VIP_BOXES and not current_user.is_authenticated:
