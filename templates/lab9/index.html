@@ -8,7 +8,6 @@
 <h2> Новогодние подарки </h2>
 
 <p>Неоткрытых коробок: <span id="count">{{ unopened_count }}</span></p>
-<p>Вы открыли: <span id="user-opened-count">{{ user_opened_count }}</span>/3</p>
 
 <div class="user-status">
     {% if current_user.is_authenticated %}
@@ -18,7 +17,7 @@
     {% endif %}
 </div>
 {% if not current_user.is_authenticated %}
-    <li><a class="menu-link" href="/lab8/login">Войти</a></li>
+    <li><a class="menu-link" href="/lab8/login">Вход</a></li>
 {% endif %}
 {% if current_user.is_authenticated %}
     <li><a class="menu-link" href="/lab8/logout">Выход</a></li>
@@ -51,6 +50,7 @@
         display:none;
         position:fixed;
         top:0; left:0;
+        width: 600px; height: 800px;
         width:100%; height:100%;
         background:rgba(0,0,0,0.6);
     ">
@@ -74,44 +74,23 @@
 
 <script>
 function openBox(id) {
-    console.log(`Opening box ${id}`);
-    
     fetch('/lab9/open', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({box_id: id})
     })
-    .then(r => {
-        console.log(`Response status: ${r.status}`);
-        if (!r.ok) {
-            throw new Error(`HTTP error ${r.status}`);
-        }
-        return r.json();
-    })
+    .then(r => r.json())
     .then(data => {
-        console.log('Response data:', data);
-        
-        if (data.error) { 
-            alert(data.error); 
-            return; 
-        }
+        if (data.error) { alert(data.error); return; }
 
         document.getElementById('box' + id).style.opacity = '0.3';
 
         document.getElementById('modal-content').innerHTML =
             `<p>${data.text}</p>
-            <img src="/static/${data.gift}" width="300">
-            <p>Вы открыли подарков: ${data.user_opened_count}/3</p>`;
+            <img src="/static/${data.gift}" width="200">`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
-        if (document.getElementById('user-opened-count')) {
-            document.getElementById('user-opened-count').innerText = data.user_opened_count;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Произошла ошибка при открытии коробки. Проверьте консоль для подробностей.');
     });
 }
 
@@ -121,23 +100,7 @@ function closeModal() {
 
 function resetBoxes() {
     fetch('/lab9/reset', {method: 'POST'})
-        .then(r => {
-            if (!r.ok) {
-                throw new Error(`HTTP error ${r.status}`);
-            }
-            return r.json();
-        })
-        .then(data => {
-            if (data.ok) {
-                location.reload();
-            } else if (data.error) {
-                alert(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Произошла ошибка при сбросе коробок');
-        });
+        .then(() => location.reload());
 }
 </script>
 {% endblock %}
