@@ -1,24 +1,12 @@
-from flask import Blueprint, render_template, session, jsonify, request
+from flask import Blueprint, render_template, session, jsonify, request, g
 from flask_login import login_required, current_user
-import random
+import json
 
 lab9 = Blueprint('lab9', __name__)
-
 
 BOX_COUNT = 10
 BOX_SIZE = 120  # размер коробки в px
 VIP_BOXES = {1, 2, 3}  # VIP-подарки
-
-# состояние коробок
-boxes = {
-    i: {
-        "opened": False,
-        "text": f"Поздравление №{i}",
-        "gift": f"lab9/gift{i}.jpg",
-        "box": f"lab9/box{i}.png"
-    }
-    for i in range(1, BOX_COUNT + 1)
-}
 
 # Фиксированные позиции для каждой коробки
 FIXED_POSITIONS = {
@@ -34,48 +22,80 @@ FIXED_POSITIONS = {
     10: {"top": 200, "left": 1100}
 }
 
+# Инициализация состояния коробок для каждого пользователя
+def get_user_boxes():
+    if 'boxes' not in session:
+        # Создаем начальное состояние для нового пользователя
+        boxes = {}
+        for i in range(1, BOX_COUNT + 1):
+            boxes[str(i)] = {
+                "opened": False,
+                "text": f"Поздравление №{i}",
+                "gift": f"lab9/gift{i}.jpg",
+                "box": f"lab9/box{i}.png"
+            }
+        session['boxes'] = json.dumps(boxes)
+    
+    return json.loads(session['boxes'])
+
+def save_user_boxes(boxes):
+    session['boxes'] = json.dumps(boxes)
+
 @lab9.route('/lab9')
 def lab9_page():
-    session.setdefault('opened_count', 0)
-
-    # Всегда используем фиксированные позиции
-    positions = FIXED_POSITIONS.copy()
-
-    unopened_count = sum(not b['opened'] for b in boxes.values())
+    # Инициализация счетчика открытий для пользователя
+    if 'opened_count' not in session:
+        session['opened_count'] = 0
+    
+    boxes = get_user_boxes()
+    unopened_count = sum(not box['opened'] for box in boxes.values())
+    
     return render_template(
         'lab9/index.html',
         boxes=boxes,
-        positions=positions,
+        positions=FIXED_POSITIONS,
         unopened_count=unopened_count
     )
 
 
 @lab9.route('/lab9/open', methods=['POST'])
-def open():
-    box_id = int(request.json['box_id'])
-
-    if box_id in VIP_BOXES and not current_user.is_authenticated:
+def open_box():
+    box_id = str(request.json['box_id'])
+    boxes = get_user_boxes()
+    
+    if int(box_id) in VIP_BOXES and not current_user.is_authenticated:
         return jsonify({"error": "Этот подарок доступен только авторизованным пользователям"})
-
+    
     if session.get('opened_count', 0) >= 3:
-        return jsonify({"error": "Можно открыть не более 3 подарков"})
-
+        return jsonify({"error": "Вы уже открыли 3 подарка. Больше нельзя!"})
+    
     if boxes[box_id]['opened']:
-        return jsonify({"error": "Этот подарок уже забрали"})
-
+        return jsonify({"error": "Вы уже открыли этот подарок"})
+    
     boxes[box_id]['opened'] = True
-    session['opened_count'] += 1
-
+    save_user_boxes(boxes)
+    session['opened_count'] = session.get('opened_count', 0) + 1
+    
+    unopened_count = sum(not box['opened'] for box in boxes.values())
+    
     return jsonify({
         "text": boxes[box_id]['text'],
         "gift": boxes[box_id]['gift'],
-        "opened_left": sum(not b['opened'] for b in boxes.values())
+        "opened_left": unopened_count,
+        "user_opened_count": session['opened_count']
     })
 
 @lab9.route('/lab9/reset', methods=['POST'])
 @login_required
 def reset():
-    for box in boxes.values():
-        box['opened'] = False
+    boxes = {}
+    for i in range(1, BOX_COUNT + 1):
+        boxes[str(i)] = {
+            "opened": False,
+            "text": f"Поздравление №{i}",
+            "gift": f"lab9/gift{i}.jpg",
+            "box": f"lab9/box{i}.png"
+        }
+    save_user_boxes(boxes)
     session['opened_count'] = 0
     return jsonify({"ok": True})

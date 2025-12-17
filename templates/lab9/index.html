@@ -80,16 +80,24 @@ function openBox(id) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.error) { alert(data.error); return; }
+        if (data.error) { 
+            alert(data.error); 
+            return; 
+        }
 
         document.getElementById('box' + id).style.opacity = '0.3';
 
         document.getElementById('modal-content').innerHTML =
             `<p>${data.text}</p>
-            <img src="/static/${data.gift}" width="300">`;
+            <img src="/static/${data.gift}" width="300">
+            <p>Вы открыли подарков: ${data.user_opened_count}/3</p>`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Произошла ошибка при открытии коробки');
     });
 }
 
@@ -99,7 +107,11 @@ function closeModal() {
 
 function resetBoxes() {
     fetch('/lab9/reset', {method: 'POST'})
-        .then(() => location.reload());
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                location.reload();
+            }
+        });
 }
 </script>
-{% endblock %}
