@@ -5,70 +5,133 @@
 {% block script %}{% endblock %}
 
 {% block main %}
-<h2> Новогодние подарки </h2>
+<div style="background: linear-gradient(135deg, #1a472a 0%, #0c2d1a 100%); padding: 20px; border-radius: 15px; border: 3px solid #c41e3a;">
+    <h2 style="color: #ffd700; text-align: center; font-family: 'Georgia', serif; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">🎁 Новогодние подарки 🎁</h2>
 
-<p>Неоткрытых коробок: <span id="count">{{ unopened_count }}</span></p>
+    <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin: 20px 0; border: 2px dashed #ffd700;">
+        <p style="color: white; font-size: 18px; margin: 0;">
+            Неоткрытых коробок: 
+            <span id="count" style="color: #ffd700; font-weight: bold; font-size: 24px;">{{ unopened_count }}</span>
+        </p>
+    </div>
 
-<div class="user-status">
+    <div class="user-status" style="background: #c41e3a; color: white; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #ffd700;">
+        {% if current_user.is_authenticated %}
+            🎅 Вы вошли как: <strong style="color: #ffd700;">{{ current_user.login }}</strong>
+        {% else %}
+            ❄️ Вы не авторизованы
+        {% endif %}
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+        {% if not current_user.is_authenticated %}
+            <a class="menu-link" href="/lab8/login" style="
+                background: #c41e3a;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+                border: 2px solid #ffd700;
+                font-weight: bold;
+            ">Вход в мастерскую</a>
+        {% endif %}
+        {% if current_user.is_authenticated %}
+            <a class="menu-link" href="/lab8/logout" style="
+                background: #2d5a27;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                text-decoration: none;
+                border: 2px solid #ffd700;
+                font-weight: bold;
+            ">Выход</a>
+        {% endif %}
+    </div>
+
     {% if current_user.is_authenticated %}
-        Вы вошли как: <strong>{{ current_user.login }}</strong>
-    {% else %}
-        Вы не авторизованы
+    <div style="text-align: center; margin-bottom: 30px;">
+        <button onclick="resetBoxes()" style="
+            background: linear-gradient(to bottom, #c41e3a, #8b0000);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            border: 3px solid #ffd700;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        ">
+            🎄 Дед Мороз, обнови подарки! 🎄
+        </button>
+    </div>
     {% endif %}
-</div>
-{% if not current_user.is_authenticated %}
-    <li><a class="menu-link" href="/lab8/login">Вход</a></li>
-{% endif %}
-{% if current_user.is_authenticated %}
-    <li><a class="menu-link" href="/lab8/logout">Выход</a></li>
-{% endif %}
 
-{% if current_user.is_authenticated %}
-<button onclick="resetBoxes()"> Дед Мороз</button>
-{% endif %}
+    <div style="
+        position: relative; 
+        height: 400px; 
+        background: rgba(26, 71, 42, 0.3); 
+        border-radius: 15px; 
+        border: 3px solid #c41e3a;
+        overflow: hidden;
+    ">
+        {% for id, box in boxes.items() %}
+            <img
+                src="/static/{{ box.box }}"
+                id="box{{ id }}"
+                onclick="openBox({{ id }})"
+                style="
+                    position: absolute;
+                    top: {{ positions[id]['top'] }}px;
+                    left: {{ positions[id]['left'] }}px;
+                    width: 200px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.5));
+                    {% if box.opened %}opacity: 0.3; transform: scale(0.95);{% endif %}
+                "
+                onmouseover="this.style.transform='scale(1.05)'"
+                onmouseout="this.style.transform='{% if box.opened %}scale(0.95){% else %}scale(1){% endif %}'"
+            >
+        {% endfor %}
+        
+        <div style="position: absolute; top: 10px; right: 10px; font-size: 30px;">🎄</div>
+        <div style="position: absolute; bottom: 10px; left: 10px; font-size: 30px;">✨</div>
+        <div style="position: absolute; top: 50%; left: 10px; font-size: 30px;">❄️</div>
+    </div>
 
-<div style="position: relative; height: 400px;">
-    {% for id, box in boxes.items() %}
-        <img
-            src="/static/{{ box.box }}"
-            id="box{{ id }}"
-            onclick="openBox({{ id }})"
-            style="
-                position: absolute;
-                top: {{ positions[id]['top'] }}px;
-                left: {{ positions[id]['left'] }}px;
-                width: 200px;
-                cursor: pointer;
-                {% if box.opened %}opacity: 0.3;{% endif %}
-            "
-        >
-    {% endfor %}
-</div>
-
-<div id="result"></div>
+    <div id="result"></div>
+    
     <div id="modal" style="
         display:none;
         position:fixed;
         top:0; left:0;
-        width: 600px; height: 800px;
         width:100%; height:100%;
-        background:rgba(0,0,0,0.6);
+        background:rgba(10, 40, 20, 0.95);
+        z-index: 1000;
     ">
         <div style="
-            background:white;
+            background: linear-gradient(135deg, #1a472a 0%, #0c2d1a 100%);
             width:500px;
             margin:60px auto;
-            padding:20px;
+            padding:30px;
             text-align:center;
             position:relative;
+            border-radius: 15px;
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
         ">
             <span onclick="closeModal()" style="
                 position:absolute;
-                top:5px; right:10px;
+                top:10px; right:15px;
                 cursor:pointer;
+                color: #ffd700;
+                font-size: 24px;
+                font-weight: bold;
             ">✖</span>
 
-        <div id="modal-content"></div>
+            <div id="modal-content" style="color: white; font-family: 'Georgia', serif;"></div>
+        </div>
     </div>
 </div>
 
@@ -81,13 +144,27 @@ function openBox(id) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.error) { alert(data.error); return; }
+        if (data.error) { 
+            alert(data.error); 
+            return; 
+        }
 
-        document.getElementById('box' + id).style.opacity = '0.3';
+        const boxElement = document.getElementById('box' + id);
+        boxElement.style.opacity = '0.3';
+        boxElement.style.transform = 'scale(0.95)';
 
         document.getElementById('modal-content').innerHTML =
-            `<p>${data.text}</p>
-            <img src="/static/${data.gift}" width="200">`;
+            `<h3 style="color: #ffd700; margin-bottom: 20px;">🎁 Вот ваш подарок! 🎁</h3>
+            <p style="font-size: 18px; margin-bottom: 25px;">${data.text}</p>
+            <img src="/static/${data.gift}" width="250" style="
+                border: 3px solid #ffd700;
+                border-radius: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.1);
+            ">
+            <p style="margin-top: 25px; color: #ffd700; font-size: 16px;">
+                Осталось неоткрытых подарков: ${data.opened_left}
+            </p>`;
 
         document.getElementById('modal').style.display = 'block';
         document.getElementById('count').innerText = data.opened_left;
@@ -99,8 +176,10 @@ function closeModal() {
 }
 
 function resetBoxes() {
-    fetch('/lab9/reset', {method: 'POST'})
-        .then(() => location.reload());
+    if(confirm('🎅 Дед Мороз спрячет все подарки и положит новые! Продолжить?')) {
+        fetch('/lab9/reset', {method: 'POST'})
+            .then(() => location.reload());
+    }
 }
 </script>
 {% endblock %}
